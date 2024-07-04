@@ -112,7 +112,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		}
 		if (obj.children) {
 			let textInsets = property.textInsets || [0, 0, 0, 0]
-			let isVertical = property.textDirection == 'VERTICAL'
+			let isVertical = property.textDirection && property.textDirection.indexOf('VERTICAL') > -1
 			let verticalAlignment = property.textVerticalAlignment
 			if (!isVertical && (verticalAlignment == 'MIDDLE' || verticalAlignment == 'BOTTOM')) {
 				let totalTextHeight = calcTextHeight(obj)
@@ -128,7 +128,11 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			}
 			for (let i = 0; i < obj.children.length; i++) {
 				let p = obj.children[i]
-				marginTop += await drawTextP(obj, p, isVertical, marginTop)
+				if (isVertical) {
+				    await drawTextP(obj, p, isVertical, 0, i)
+				} else {
+				    marginTop += await drawTextP(obj, p, isVertical, marginTop, i)
+				}
 			}
 		}
 		ctx.restore()
@@ -195,7 +199,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		return totalTextHeight
 	}
 
-	async function drawTextP(textObj, p, isVertical, marginTop) {
+	async function drawTextP(textObj, p, isVertical, marginTop, pIdx) {
 		if (!p.children) {
 			return
 		}
@@ -304,6 +308,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			}
 			if (isVertical) {
 				// 竖版
+				x = x + fontSize * pIdx
 				if (property.lang == 'en-US' && /^[0-9a-zA-Z]+$/.test(r.text)) {
 					// 数字英文竖着的时候需要旋转90°方式呈现
 					let textWidth = ctx.measureText(r.text).width
@@ -909,9 +914,14 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			} else if (paint.type == 'texture') {
 				// 图片或纹理
 				let texture = paint.texture
-				loadImage(texture.imageData).then(img => {
-					let pat = createTexturePattern(img, texture, anchor, isBackground)
-					resolve(pat)
+				let anonymous = texture.duoTone && texture.duoTone.length > 0 && texture.duoTonePrst
+				loadImage(texture.imageData, anonymous).then(img => {
+				    if (img) {
+                        let pat = createTexturePattern(img, texture, anchor, isBackground)
+                        resolve(pat)
+					} else {
+					    resolve('transparent')
+					}
 				})
 			} else if (paint.type == 'pattern') {
 				// 图案
@@ -1021,6 +1031,26 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			    patternCtx.drawImage(img, 0, 0, width, height)
 		    }
 		}
+		if (texture.duoTone && texture.duoTone.length > 0 && texture.duoTonePrst) {
+		    try {
+                // 重新着色
+                let color = texture.duoTone[0].realColor
+                let r = (color >> 16) & 255
+                let g = (color >> 8) & 255
+                let b = (color >> 0) & 255
+                let imageData = patternCtx.getImageData(0, 0, patternCanvas.width, patternCanvas.height)
+                let data = imageData.data
+                for(var i = 0; i < data.length; i += 4) {
+                    let gray = (data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11) / 255
+                    // black / white
+                    let prst = texture.duoTonePrst == 'white' ? 255 : 0
+                    data[i] = gray * r + (1 - gray) * prst
+                    data[i + 1] = gray * g + (1 - gray) * prst
+                    data[i + 2] = gray * b + (1 - gray) * prst
+                }
+                patternCtx.putImageData(imageData, 0, 0)
+            } catch(e) {}
+		}
 		return ctx.createPattern(patternCanvas, mode)
 	}
 
@@ -1063,7 +1093,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		return (a & 255) << 24 | (r & 255) << 16 | (g & 255) << 8 | (b & 255) << 0
 	}
 
-	function loadImage(src) {
+	function loadImage(src, anonymous) {
 		return new Promise(resolve => {
 			if (!src) {
 				resolve()
@@ -1078,11 +1108,11 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			let img = imageCache[cacheKey]
 			if (img == null) {
 				img = new Image()
-				if (imageCrossOrigin) {
+				if (imageCrossOrigin || anonymous) {
                     let eqOrigin = src.startsWith('data:') || src.startsWith(document.location.origin) || (src.startsWith('//') && (document.location.protocol + src).startsWith(document.location.origin))
                     if (!eqOrigin) {
                         // anonymous / use-credentials
-                        img.crossOrigin = imageCrossOrigin
+                        img.crossOrigin = imageCrossOrigin || 'anonymous'
                     }
                 }
 				img.src = src

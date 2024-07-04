@@ -311,12 +311,12 @@ function Ppt2Svg(svgId, svgWidth, svgHeight) {
         anchor = property.anchor
         let wordWrap = property.textWordWrap
         let textInsets = property.textInsets || [0, 0, 0, 0]
-        let isVertical = property.textDirection == 'VERTICAL'
+        let isVertical = property.textDirection && property.textDirection.indexOf('VERTICAL') > -1
         let verticalAlignment = property.textVerticalAlignment
         let textNode = g.append('text').attr('id', obj.id).attr('x', anchor[0]).attr('y', anchor[1])
         textNode.style('user-select', 'none')
         if (isVertical) {
-            textNode.style('writing-mode', 'vertical-lr')
+            textNode.style('writing-mode', 'vertical-rl')
         }
         let marginTop = property.strokeStyle ? (property.strokeStyle.lineWidth || 1) : 0
         let maxFontSize = 0
@@ -401,8 +401,19 @@ function Ppt2Svg(svgId, svgWidth, svgHeight) {
                     }
                 }
             }
-            marginTop += (maxFontSize * lineSpacing)
-            pNode.attr('y', anchor[1] + marginTop)
+            if (isVertical) {
+                if (verticalAlignment == 'MIDDLE') {
+                    pNode.attr('x', anchor[0] + maxFontSize * (obj.children.length - i - 1) + (anchor[2] - maxFontSize * obj.children.length) / 2)
+                } else if (verticalAlignment == 'TOP') {
+                    pNode.attr('x', anchor[0] + anchor[2] - maxFontSize * (i + 1))
+                } else {
+                    pNode.attr('x', anchor[0] + maxFontSize * (obj.children.length - i - 1))
+                }
+                pNode.attr('y', anchor[1])
+            } else {
+                marginTop += (maxFontSize * lineSpacing)
+                pNode.attr('y', anchor[1] + marginTop)
+            }
         }
         let yHeight = 0
         if (verticalAlignment == 'MIDDLE') {
@@ -792,7 +803,9 @@ function Ppt2Svg(svgId, svgWidth, svgHeight) {
                 }
             }
             loadImage(texture.imageData).then(img => {
-                texturePattern(patternNode, img, texture, anchor)
+                if (img) {
+                    texturePattern(patternNode, img, texture, anchor)
+                }
             })
             return `url(#${patternId})`
         } else if (paint.type == 'pattern') {
@@ -919,6 +932,26 @@ function Ppt2Svg(svgId, svgWidth, svgHeight) {
             } else {
                 patternCtx.drawImage(img, 0, 0, width, height)
             }
+        }
+        if (texture.duoTone && texture.duoTone.length > 0 && texture.duoTonePrst) {
+            try {
+                // 重新着色
+                let color = texture.duoTone[0].realColor
+                let r = (color >> 16) & 255
+                let g = (color >> 8) & 255
+                let b = (color >> 0) & 255
+                let imageData = patternCtx.getImageData(0, 0, patternCanvas.width, patternCanvas.height)
+                let data = imageData.data
+                for(var i = 0; i < data.length; i += 4) {
+                    let gray = (data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11) / 255
+                    // black / white
+                    let prst = texture.duoTonePrst == 'white' ? 255 : 0
+                    data[i] = gray * r + (1 - gray) * prst
+                    data[i + 1] = gray * g + (1 - gray) * prst
+                    data[i + 2] = gray * b + (1 - gray) * prst
+                }
+                patternCtx.putImageData(imageData, 0, 0)
+            } catch(e) {}
         }
         // let mode = texture.alignment ? 'repeat' : 'no-repeat'
         let imgSrc = patternCanvas.toDataURL('image/png')
@@ -1050,7 +1083,11 @@ function Ppt2Svg(svgId, svgWidth, svgHeight) {
                     point = c.extInfo.property.anchor
                 }
                 let _point
-                if (point[3] == 0) {
+                if (point[2] < 0.1) {
+                    let width = (c.extInfo.property.strokeStyle || {}).lineWidth || 1
+                    let x = point[0] - width / 2
+                    _point = { x: x, endX: x + width, y: point[1], endY: point[1] + point[3], sort: width + point[3], obj: c }
+                } else if (point[3] < 0.1) {
                     let height = (c.extInfo.property.strokeStyle || {}).lineWidth || 1
                     let y = point[1] - height / 2
                     _point = { x: point[0], endX: point[0] + point[2], y: y, endY: y + height, sort: point[2] + height, obj: c }

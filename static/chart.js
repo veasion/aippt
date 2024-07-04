@@ -692,6 +692,18 @@ function createCtxTexturePattern(ctx, img, texture, anchor, isBackground) {
     if (texture.alpha >= 0 && texture.alpha < 100000) {
         patternCtx.globalAlpha = texture.alpha / 100000
     }
+    let imgInsets = null
+    if (texture.insets) {
+        let top = texture.insets[0] / 100000
+        let left = texture.insets[1] / 100000
+        let bottom = texture.insets[2] / 100000
+        let right = texture.insets[3] / 100000
+        let x = img.width * left
+        let y = img.height * top
+        let w = img.width * (1 - left - right)
+        let h = img.height * (1 - top - bottom)
+        imgInsets = [x, y, w, h]
+    }
     if (texture.stretch) {
         let top = texture.stretch[0] / 100000
         let left = texture.stretch[1] / 100000
@@ -701,7 +713,11 @@ function createCtxTexturePattern(ctx, img, texture, anchor, isBackground) {
         let y = height * top
         let w = width * (1 - left - right)
         let h = height * (1 - top - bottom)
-        patternCtx.drawImage(img, x, y, w, h)
+        if (imgInsets) {
+            patternCtx.drawImage(img, imgInsets[0], imgInsets[1], imgInsets[2], imgInsets[3], x, y, w, h)
+        } else {
+            patternCtx.drawImage(img, x, y, w, h)
+        }
     } else if (texture.alignment) {
         let x = 0, y = 0
         if (texture.alignment == 'CENTER') {
@@ -714,7 +730,29 @@ function createCtxTexturePattern(ctx, img, texture, anchor, isBackground) {
         }
         patternCtx.drawImage(img, x, y, width, height, 0, 0, width, height)
     } else {
-        patternCtx.drawImage(img, 0, 0, width, height)
+        if (imgInsets) {
+            patternCtx.drawImage(img, imgInsets[0], imgInsets[1], imgInsets[2], imgInsets[3], 0, 0, width, height)
+        } else {
+            patternCtx.drawImage(img, 0, 0, width, height)
+        }
+    }
+    if (texture.duoTone && texture.duoTone.length > 0 && texture.duoTonePrst) {
+        // 重新着色
+        let color = texture.duoTone[0].realColor
+        let r = (color >> 16) & 255
+        let g = (color >> 8) & 255
+        let b = (color >> 0) & 255
+        let imageData = patternCtx.getImageData(0, 0, patternCanvas.width, patternCanvas.height)
+        let data = imageData.data
+        for(var i = 0; i < data.length; i += 4) {
+            let gray = (data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11) / 255
+            // black / white
+            let prst = texture.duoTonePrst == 'white' ? 255 : 0
+            data[i] = gray * r + (1 - gray) * prst
+            data[i + 1] = gray * g + (1 - gray) * prst
+            data[i + 2] = gray * b + (1 - gray) * prst
+        }
+        patternCtx.putImageData(imageData, 0, 0)
     }
     return ctx.createPattern(patternCanvas, mode)
 }
