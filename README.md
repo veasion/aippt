@@ -17,7 +17,7 @@
 
 
 
-https://metasign-public.oss-cn-shanghai.aliyuncs.com/github/aippt.mp4
+<iframe src="https://metasign-public.oss-cn-shanghai.aliyuncs.com/github/aippt.mp4" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
 
 
 
