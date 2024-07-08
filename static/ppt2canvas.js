@@ -27,7 +27,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			let slideLayoutIdx = page.extInfo.slideLayoutIdx
 			let slideLayout = slideLayoutIdx != null ? slideMaster.slideLayouts[slideLayoutIdx] : null
 			await drawBackground(page.extInfo.background || (slideLayout || {}).background || slideMaster.background)
-			await drawSlideMaster(slideMaster, placeholder)
+			await drawSlideMaster(slideMaster, slideLayout, placeholder)
 			if (slideLayout) {
 			    await drawSlideLayout(slideLayout, placeholder)
 			}
@@ -502,6 +502,9 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		let property = obj.extInfo.property
 		ctx.save()
 		ctx.translate(property.anchor[0], property.anchor[1])
+		if (templateHandle) {
+		    await templateHandle('diagram', obj, ctx)
+		}
 		for (let i = 0; i < obj.children.length; i++) {
 			await drawElement(obj.children[i])
 		}
@@ -517,6 +520,9 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			let _groupFlipY = ctx.groupFlipY
 			let _groupRotation = ctx.groupRotation
 			shapeHandle(property)
+			if (templateHandle) {
+                await templateHandle('container', obj, ctx)
+            }
 			let parentGroupFillStyle = ctx.groupFillStyle
 			let groupFillStyle = property.groupFillStyle
 			if (groupFillStyle) {
@@ -573,6 +579,9 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		ctx.save()
 		shapeHandle(property)
 		await drawGeometry(property)
+		if (templateHandle) {
+            await templateHandle('connector', obj, ctx)
+        }
 		ctx.restore()
 	}
 
@@ -580,6 +589,9 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		let property = obj.extInfo.property
 		ctx.save()
 		shapeHandle(property)
+		if (templateHandle) {
+            await templateHandle('graphicFrame', obj, ctx)
+        }
 		if (property.chart && property.chart.chartData && property.chart.chartData.length > 0) {
 			await drawChart(property.chart, property.anchor, canvas, ctx)
 		}
@@ -795,13 +807,16 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		ctx.bgFillStyle = ctx.fillStyle
 	}
 
-	async function drawSlideMaster(slideMaster, placeholder) {
+	async function drawSlideMaster(slideMaster, slideLayout, placeholder) {
 		recursion(slideMaster.children, obj => {
 			if (obj.extInfo.property && obj.extInfo.property.placeholder) {
 				obj.noDraw = true
                 placeholder[obj.extInfo.property.placeholder.type] = obj.extInfo.property
 			}
 		})
+	    if (slideLayout && slideLayout.noMaster) {
+            return
+        }
 		for (let i = 0; slideMaster.children && i < slideMaster.children.length; i++) {
 			await drawElement(slideMaster.children[i])
 		}

@@ -390,7 +390,6 @@
                 }
                 html += '<div class="left_div_item" onclick="drawPptx(' + i + ')">'
                 html += '<div class="left_div_item_index">' + (i + 1) + '</div>'
-                // html += '<img id="img_' + i + '" src="' + src + '" class="left_div_item_img" />'
                 html += '<canvas id="img_' + i + '" width="288" height="162" style="width: 144px;height: 81px;" class="left_div_item_img" />'
                 html += '</div>'
             }
@@ -449,6 +448,10 @@
                 a.download = name + '.pptx'
                 a.click()
             }
+        }
+        xhr.onerror = function (e) {
+            console.error(e)
+            download.innerText = '渲染pptx并下载'
         }
         xhr.send(JSON.stringify(pptxObj))
     }

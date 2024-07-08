@@ -79,7 +79,7 @@ function Ppt2Svg(svgId, svgWidth, svgHeight) {
             let slideLayoutIdx = page.extInfo.slideLayoutIdx
             let slideLayout = slideLayoutIdx != null ? slideMaster.slideLayouts[slideLayoutIdx] : null
             drawBackground(page.extInfo.background || (slideLayout || {}).background || slideMaster.background)
-            drawSlideMaster(slideMaster, placeholder)
+            drawSlideMaster(slideMaster, slideLayout, placeholder)
             if (slideLayout) {
                 drawSlideLayout(slideLayout, placeholder)
             }
@@ -218,13 +218,16 @@ function Ppt2Svg(svgId, svgWidth, svgHeight) {
             .attr('fill', fill)
     }
 
-    function drawSlideMaster(slideMaster, placeholder) {
+    function drawSlideMaster(slideMaster, slideLayout, placeholder) {
         recursion(slideMaster.children, obj => {
             if (obj.extInfo.property && obj.extInfo.property.placeholder) {
                 obj.noDraw = true
                 placeholder[obj.extInfo.property.placeholder.type] = obj.extInfo.property
             }
         })
+        if (slideLayout && slideLayout.noMaster) {
+            return
+        }
         for (let i = 0; slideMaster.children && i < slideMaster.children.length; i++) {
             drawElement(slideMaster.children[i])
         }
