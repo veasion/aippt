@@ -46,8 +46,7 @@ https://github.com/veasion/aippt/assets/24989778/24d5654b-09f3-4554-a732-dbffc10
 
 针对上面技术，我们开发了一套可商用 aippt 软件，
 
-官网地址：https://docmee.cn
-
+官网地址（开放API）：https://docmee.cn
 
 
 支持私有化部署，源码讲解！
