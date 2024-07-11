@@ -5,13 +5,13 @@
     <title>Ai PPT</title>
     <style>
         ::-webkit-scrollbar {
-			width: 5px;
-			height: 5px;
-			background-color: #fff;
-		}
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+        }
 		::-webkit-scrollbar-thumb {
-			background-color: #c1c1c1;
-		}
+            background-color: #c1c1c1;
+        }
         #div1 {
             text-align: center;
             margin-top: 60px;
@@ -27,27 +27,27 @@
             width: 80%;
             max-width: 1050px;
             margin: auto;
-			display: flex;
-			flex-wrap: wrap;
-			flex-direction: row;
-			align-items: center;
-			text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            align-items: center;
+            text-align: center;
         }
         .template {
-			margin: 8px;
-			width: 240px;
-			height: 136px;
-			cursor: pointer;
-			overflow: hidden;
-			border-radius: 12px;
+            margin: 8px;
+            width: 240px;
+            height: 136px;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 12px;
             background-color: #ecedf4;
-			border: 2px solid transparent;
+            border: 2px solid transparent;
         }
         .template img {
-			width: 100%;
-			height: 100%;
-			opacity: 1;
-			object-fit: cover;
+            width: 100%;
+            height: 100%;
+            opacity: 1;
+            object-fit: cover;
             transition: all .6s ease;
         }
         .template img:hover {
@@ -199,12 +199,12 @@
 <script src="static/pako.js"></script>
 <script src="static/marked.js"></script>
 <script>
-	const apiKey = '9664f0ea9a4cee65c'
+    const apiKey = '9664f0ea9a4cee65c'
     var pptxId = null
     var outline = ''
     var templateId = ''
     var pptxObj = null
-    let selectIdx = 0
+    var selectIdx = 0
     var mTimer = null
 
     var markdownRenderer = new marked.Renderer()
@@ -369,8 +369,8 @@
                 if (xhr.status === 200) {
                     let resp = JSON.parse(xhr.responseText)
                     let gzipBase64 = resp.data.pptxProperty
-					let gzip = base64js.toByteArray(gzipBase64)
-					let json = pako.ungzip(gzip, { to: 'string' })
+                    let gzip = base64js.toByteArray(gzipBase64)
+                    let json = pako.ungzip(gzip, { to: 'string' })
                     pptxObj = JSON.parse(json)
                     drawPptxList(resp.data.current - 1, true)
                 }
@@ -467,8 +467,8 @@
                 resolve(img)
             }
             img.onerror = function (e) {
-			    resolve()
-			}
+                resolve()
+            }
         })
         let canvas = document.createElement('canvas')
         let ctx = canvas.getContext('2d')
@@ -517,9 +517,9 @@
         // return `rgb(${colors[0]})`
         return `linear-gradient(to bottom right, rgb(${colors[0]}), rgb(${colors[1]}), rgb(${colors[2]}))`
     }
-	function resetSize() {
+    function resetSize() {
 	    let width = Math.max(Math.min(document.body.clientWidth - 400, 1600), 480)
-        painter.resetSize(width, width * 0.5625)
+	    painter.resetSize(width, width * 0.5625)
 	}
 
     window.addEventListener('resize', function() {
