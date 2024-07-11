@@ -48,6 +48,9 @@ https://github.com/veasion/aippt/assets/24989778/24d5654b-09f3-4554-a732-dbffc10
 
 官网地址（开放API）：https://docmee.cn
 
+开放平台（API/UI 接入）：
+https://docmee.cn/open-platform
+
 
 支持私有化部署，源码讲解！
 
