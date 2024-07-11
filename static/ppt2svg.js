@@ -618,11 +618,10 @@ function Ppt2Svg(svgId, svgWidth, svgHeight) {
         }
         let anchor = property.anchor
         let stroke = null
+        let lineWidth = 1
         if (property.strokeStyle) {
             lineWidth = property.strokeStyle.lineWidth || 1
             stroke = toPaint(property.strokeStyle.paint, anchor)
-        } else {
-            lineWidth = 1
         }
         let paths = geometryPaths(property)
         for (let i = 0; i < paths.length; i++) {
