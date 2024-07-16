@@ -393,7 +393,17 @@
                 html += '<canvas id="img_' + i + '" width="288" height="162" style="width: 144px;height: 81px;" class="left_div_item_img" />'
                 html += '</div>'
             }
-            document.getElementById('left_image_list').innerHTML = html
+            if (asyncGen && idx < pptxObj.pages.length - 1) {
+                html += '<div class="left_div_item">'
+                html += '<div class="left_div_item_index">' + (idx + 2) + '</div>'
+                html += '<div style="width: 144px;height: 81px;text-align: center;line-height: 81px;color: #666;cursor: default;" class="left_div_item_img">生成中...</div>'
+                html += '</div>'
+            }
+            let itemList = document.getElementById('left_image_list')
+            itemList.innerHTML = html
+            if (asyncGen) {
+                itemList.scrollBy(0, itemList.scrollHeight)
+            }
             for (let i = 0; i < pptxObj.pages.length; i++) {
                 let imgCanvas = document.getElementById('img_' + i)
                 if (!imgCanvas) {
@@ -419,6 +429,9 @@
         drawPptx(idx || 0)
     }
     function drawPptx(idx) {
+        if (idx == 0) {
+            document.getElementById('img_0').scrollIntoView(true)
+        }
         let lastSelect = document.getElementById('img_' + selectIdx)
         lastSelect && lastSelect.classList.remove('item_select')
         document.getElementById('right_canvas').style.display = 'block'
