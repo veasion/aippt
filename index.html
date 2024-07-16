@@ -251,7 +251,7 @@
         source.onmessage = function (data) {
             let json = JSON.parse(data.data)
             outline += json.text
-            document.getElementById('outline').innerHTML = window.marked.marked(outline)
+            document.getElementById('outline').innerHTML = window.marked.marked(outline.replaceAll('```markdown', '').replaceAll('```', ''))
             window.scrollTo({ behavior: 'smooth', top: document.body.scrollHeight })
         }
         source.onend = function (data) {
