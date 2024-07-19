@@ -791,4 +791,4 @@ function toColor(colorObj, defaultColor) {
     return `rgba(${r}, ${g}, ${b}, ${a})`
 }
 
-// export { drawChart }
+export { drawChart }

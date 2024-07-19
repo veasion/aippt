@@ -14,6 +14,42 @@
 
 
 
+API SDK DEMO：
+
+* js demo
+
+  https://github.com/veasion/aippt
+
+* vue demo
+
+  https://github.com/veasion/aippt-vue
+
+* java demo
+
+  https://github.com/veasion/aippt-api-java-demo
+
+* python demo
+
+  https://github.com/veasion/aippt-api-python-demo
+
+* go demo
+
+  https://github.com/veasion/aippt-api-go-demo
+
+* .net / c# demo
+
+  https://github.com/veasion/aippt-api-dotnet-demo
+
+* php demo
+
+  https://github.com/veasion/aippt-api-php-demo
+
+* c++ demo
+
+  https://github.com/veasion/aippt-api-cpp-demo
+
+
+
 进群交流（文多多AiPPT技术交流群）：
 
 ![qrcode](https://metasign-public.oss-cn-shanghai.aliyuncs.com/github/contact_me_qr.png)

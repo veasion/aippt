@@ -490,4 +490,4 @@ function valueEquals(v1, v2) {
     return false
 }
 
-// export { geometryPaths }
+export { geometryPaths }

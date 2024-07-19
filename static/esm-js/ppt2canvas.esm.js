@@ -1,5 +1,5 @@
-// import { geometryPaths } from './geometry.js'
-// import { drawChart } from './chart.js'
+import { geometryPaths } from './geometry.esm.js'
+import { drawChart } from './chart.esm.js'
 
 function Ppt2Canvas(_canvas, imageCrossOrigin) {
 	var canvas = (typeof _canvas == 'string') ? document.getElementById(_canvas) : _canvas
@@ -1321,4 +1321,4 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 
 }
 
-// export { Ppt2Canvas }
+export { Ppt2Canvas }

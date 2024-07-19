@@ -209,7 +209,7 @@ function SSE(url, options) {
 	};
 };
 
-// export { SSE }
+export { SSE }
 
 /*
 const url = 'https://xxx/chat';

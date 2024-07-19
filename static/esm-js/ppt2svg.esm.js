@@ -1,5 +1,5 @@
-// import { geometryPaths } from './geometry.js'
-// import { drawChart } from './chart.js'
+import { geometryPaths } from './geometry.esm.js'
+import { drawChart } from './chart.esm.js'
 
 function D3Element(element) {
     this.attr = function (k, v) {
@@ -1420,4 +1420,4 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
     })
 }
 
-// export { D3Element, d3, Ppt2Svg }
+export { D3Element, d3, Ppt2Svg }

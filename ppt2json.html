@@ -93,6 +93,10 @@
             reader.readAsText(file)
             return
         }
+		if (file.size > 1048576 * 50) {
+			alert('文件不能超过50M')
+			return
+		}
         if (file) {
             let formData = new FormData()
             formData.append('file', file)
