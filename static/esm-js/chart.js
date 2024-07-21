@@ -557,6 +557,7 @@ async function drawRect(ctx, property) {
 }
 
 function toCtxPaint(ctx, paint, anchor, isBackground, defaultColor) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return new Promise((resolve, reject) => {
         if (!paint) {
             resolve(defaultColor || 'transparent')
@@ -631,7 +632,7 @@ function toCtxPaint(ctx, paint, anchor, isBackground, defaultColor) {
         } else if (paint.type == 'pattern') {
             // 图案
             let pattern = paint.pattern
-            let prst = pattern.prst
+            // let prst = pattern.prst
             let fgColor = pattern.fgColor.realColor
             let bgColor = pattern.bgColor.realColor
             let width = anchor[2], height = anchor[3]
@@ -672,7 +673,7 @@ function toCtxPaint(ctx, paint, anchor, isBackground, defaultColor) {
     })
 }
 
-function createCtxTexturePattern(ctx, img, texture, anchor, isBackground) {
+function createCtxTexturePattern(ctx, img, texture, anchor) {
     let width = anchor[2]
     let height = anchor[3]
     let mode = texture.alignment ? 'repeat' : 'no-repeat'
@@ -789,6 +790,28 @@ function toColor(colorObj, defaultColor) {
         }
     }
     return `rgba(${r}, ${g}, ${b}, ${a})`
+}
+
+function loadImage(src) {
+    return new Promise(resolve => {
+        if (!src) {
+            resolve()
+            return
+        }
+        let img = new Image()
+        let eqOrigin = src.startsWith('data:') || src.startsWith(document.location.origin) || (src.startsWith('//') && (document.location.protocol + src).startsWith(document.location.origin))
+        if (!eqOrigin) {
+            img.crossOrigin = 'anonymous'
+        }
+        img.src = src
+        img.onload = function() {
+            resolve(img)
+        }
+        img.onerror = function (e) {
+            resolve()
+            console.log('图片加载失败: ', src, e)
+        }
+    })
 }
 
 export { drawChart }

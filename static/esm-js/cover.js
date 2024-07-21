@@ -1,3 +1,5 @@
+import { Ppt2Canvas } from './ppt2Canvas.js'
+
 async function drawPptxFun(pptxObj, idx) {
     let canvas = document.createElement('canvas')
     let width = pptxObj.width

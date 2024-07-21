@@ -1,6 +1,7 @@
-import { geometryPaths } from './geometry.esm.js'
-import { drawChart } from './chart.esm.js'
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-self-assign */
+import { geometryPaths } from './geometry.js'
+import { drawChart } from './chart.js'
 function Ppt2Canvas(_canvas, imageCrossOrigin) {
 	var canvas = (typeof _canvas == 'string') ? document.getElementById(_canvas) : _canvas
 	var ctx = canvas.getContext('2d')
@@ -1067,7 +1068,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 					data[i + 2] = gray * b + (1 - gray) * prst
 				}
 				patternCtx.putImageData(imageData, 0, 0)
-			} catch(e) {}
+			} catch(e) { /* empty */ }
 		}
 		return ctx.createPattern(patternCanvas, mode)
 	}

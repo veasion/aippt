@@ -24,6 +24,10 @@ API SDK DEMO：
 
   https://github.com/veasion/aippt-vue
 
+* react demo
+
+  https://github.com/veasion/aippt-react
+
 * java demo
 
   https://github.com/veasion/aippt-api-java-demo

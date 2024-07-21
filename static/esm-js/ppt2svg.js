@@ -1,5 +1,6 @@
-import { geometryPaths } from './geometry.esm.js'
-import { drawChart } from './chart.esm.js'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { geometryPaths } from './geometry.js'
+import { drawChart } from './chart.js'
 
 function D3Element(element) {
     this.attr = function (k, v) {
@@ -70,6 +71,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
     var pointList = []
     var mTimer = null
     var currentPoint = null
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const $this = this
 
     const svg = d3.select((typeof _svg == 'string') ? ('#' + _svg) : _svg)
@@ -968,7 +970,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                     data[i + 2] = gray * b + (1 - gray) * prst
                 }
                 patternCtx.putImageData(imageData, 0, 0)
-            } catch(e) {}
+            } catch(e) { /* empty */ }
         }
         // let mode = texture.alignment ? 'repeat' : 'no-repeat'
         let imgSrc = patternCanvas.toDataURL('image/png')

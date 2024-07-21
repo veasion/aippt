@@ -2,7 +2,7 @@
 
 
 
-aippt 项目是纯 js 代码写的（非模块化），这里专门针对 js 模块化改写了 .esm.js 文件。
+aippt 项目是纯 js 代码写的（非模块化），这里专门针对模块化改写了 js 文件。
 
 
 
@@ -21,7 +21,13 @@ aippt 项目是纯 js 代码写的（非模块化），这里专门针对 js 模
 
 
 
-在这个基础上我通过 vue3 + ts 重写了 aippt 项目作为参考：
+在这个基础上我通过 vue 和 react 重写了 aippt 项目作为参考：
+
+vue:
 
 https://github.com/veasion/aippt-vue
+
+react:
+
+https://github.com/veasion/aippt-react
 
