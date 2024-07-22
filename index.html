@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <title>Ai PPT</title>
     <style>
-		body {
-			overflow: hidden;
-		}
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -253,11 +250,22 @@
         })
         source.onmessage = function (data) {
             let json = JSON.parse(data.data)
+            if (json.status == -1) {
+                alert('生成大纲异常：' + json.error)
+                return
+            }
             outline += json.text
             document.getElementById('outline').innerHTML = window.marked.marked(outline.replaceAll('```markdown', '').replaceAll('```', ''))
             window.scrollTo({ behavior: 'smooth', top: document.body.scrollHeight })
         }
         source.onend = function (data) {
+            if (data.data.startsWith('{') && data.data.endsWith('}')) {
+                const json = JSON.parse(data.data)
+                if (json.code != 0) {
+                    alert('生成大纲异常：' + json.message)
+                    return
+                }
+            }
             document.getElementById('nextTo2').style.display = 'inline-block'
             window.scrollTo(0, 0)
         }
@@ -343,12 +351,23 @@
         })
         source.onmessage = function (data) {
             let json = JSON.parse(data.data)
+            if (json.status == -1) {
+                alert('生成PPT异常：' + json.error)
+                return
+            }
             if (json.pptId) {
                 document.getElementById('desc_msg').innerText = `正在生成中，进度 ${json.current}/${json.total}，请稍后...`
                 asyncGenPptxInfo(json.pptId)
             }
         }
         source.onend = function (data) {
+            if (data.data.startsWith('{') && data.data.endsWith('}')) {
+                const json = JSON.parse(data.data)
+                if (json.code != 0) {
+                    alert('生成PPT异常：' + json.message)
+                    return
+                }
+            }
             clearInterval(timer)
             document.getElementById('desc').style.display = 'none'
             document.getElementById('pptDownload').style.display = 'inline-block'
@@ -458,6 +477,15 @@
             if (this.status == 200) {
                 download.innerText = '渲染pptx并下载'
                 let blob = this.response
+                if (blob.type == 'application/json') {
+                    const reader = new FileReader()
+                    reader.onload = function(e) {
+                        let json = JSON.parse(e.target.result)
+                        alert('下载失败：' + json.message)
+                    }
+                    reader.readAsText(blob)
+                    return
+                }
                 let a = document.createElement('a')
                 a.href = window.URL.createObjectURL(blob)
                 let name = 'download'
