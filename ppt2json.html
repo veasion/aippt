@@ -69,7 +69,7 @@
 <script src="static/geometry.js"></script>
 <script src="static/ppt2svg.js"></script>
 <script>
-    const apiKey = '9664f0ea9a4cee65c'
+    const apiKey = '17t2c9ma8a3ceo0ks'
     var editor = new JSONEditor(document.querySelector('#json'), {}, {})
 
     var pptxObj = null
@@ -142,6 +142,15 @@
             if (this.status == 200) {
                 download_pptx.innerText = '渲染pptx并下载'
                 let blob = this.response
+                if (blob.type == 'application/json') {
+                    const reader = new FileReader()
+                    reader.onload = function(e) {
+                        let json = JSON.parse(e.target.result)
+                        alert('下载失败：' + json.message)
+                    }
+                    reader.readAsText(blob)
+                    return
+                }
                 let a = document.createElement('a')
                 a.href = window.URL.createObjectURL(blob)
                 let name = 'download'
