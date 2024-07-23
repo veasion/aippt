@@ -1,48 +1,47 @@
 <p align="center"><img src="https://docmee.cn/favicons/favicon-32x32.png" alt="logo"/></p>
-<h1 align="center">文多多 AiPPT</h1>
+<h1 align="center">Docmee AiPPT</h1>
 <p align="center">
-  简体中文 | <a href="./README_EN.md">English</a>
+  English | <a href="./README.md">简体中文</a>
 </p>
 <p align="center">
-	<a href="https://veasion.github.io/aippt" target="_blank">🔗在线演示</a>
+	<a href="https://veasion.github.io/aippt" target="_blank">🔗Demo</a>
 	<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-	<a href="https://veasion.github.io/aippt/ppt2json.html" target="_blank">📝PPT转JSON</a>
+	<a href="https://veasion.github.io/aippt/ppt2json.html" target="_blank">📝PPT to JSON</a>
 	<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-	<a href="https://docmee.cn" target="_blank">🌏官方网站</a>
+	<a href="https://docmee.cn" target="_blank">🌏Official website</a>
 	<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-	<a href="#-商业合作">💬合作交流</a>
+	<a href="#-Business+cooperation">💬Business cooperation</a>
 </p>
 
 
 
 
 
-# 🤖 AI 生成 PPT
+# 🤖 AI Generate PPT
 
-商用级 AI 生成 PPT 项目，包含以下功能：
+Commercial level AI generated PPT project, including the following features:
 
-* AI 生成 PPT
-* PPT 解析成 JSON
-* JSON 反渲染为 PPT
+* AI generated PPT
+* PPT parsed into JSON
+* JSON re-rendered as PPT
 
 
 
 # ✨ AiPPT
 
-在线体验：https://veasion.github.io/aippt
+Demo: https://veasion.github.io/aippt
 
-
-[演示视频](https://metasign-public.oss-cn-shanghai.aliyuncs.com/github/aippt.mp4)
+[Demo Video](https://metasign-public.oss-cn-shanghai.aliyuncs.com/github/aippt.mp4)
 
 https://github.com/veasion/aippt/assets/24989778/24d5654b-09f3-4554-a732-dbffc1073a1d
 
 
 
-# ✨ PPT 解析成 JSON
+# ✨ PPT to JSON
 
-支持上传PPT并渲染，在线编辑，编辑后下载 ppt 文件。
+Support uploading PPT and rendering, online editing, and download the edited PPT file.
 
-在线体验：https://veasion.github.io/aippt/ppt2json.html
+Demo: https://veasion.github.io/aippt/ppt2json.html
 
 
 
@@ -51,18 +50,18 @@ https://github.com/veasion/aippt/assets/24989778/24d5654b-09f3-4554-a732-dbffc10
 
 
 
-# 🤝 商业合作
+# 🤝 Business cooperation
 
-针对上面技术，我们开发了一套可商用 aippt 软件，支持私有化部署！
+Based on the above technology, we have developed a commercializable AIPPT software that supports private deployment!
 
-官网地址（开放API）：
+Official website (Open API)：
 https://docmee.cn
 
-开放平台（API/UI 接入）：
+Open platform (API/UI Integration)：
 https://docmee.cn/open-platform
 
 
-商业合作 & 进群交流：
+WeChat group qrcode：
 
 ![qrcode](https://metasign-public.oss-cn-shanghai.aliyuncs.com/github/contact_me_qr.png)
 
