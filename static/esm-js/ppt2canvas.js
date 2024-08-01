@@ -2,6 +2,7 @@
 /* eslint-disable no-self-assign */
 import { geometryPaths } from './geometry.js'
 import { drawChart } from './chart.js'
+
 function Ppt2Canvas(_canvas, imageCrossOrigin) {
 	var canvas = (typeof _canvas == 'string') ? document.getElementById(_canvas) : _canvas
 	var ctx = canvas.getContext('2d')
@@ -79,7 +80,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 	async function drawElement(obj) {
 		ctx.fillStyle = 'transparent'
 		ctx.strokeStyle = 'transparent'
-		if (obj.noDraw || !obj.extInfo.property.anchor) {
+		if (obj.noDraw || !obj.extInfo.property.anchor || obj.extInfo.property.hidden) {
 			// console.log('ignore element:', obj)
 			return
 		}
@@ -523,10 +524,10 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			let _groupFlipX = ctx.groupFlipX
 			let _groupFlipY = ctx.groupFlipY
 			let _groupRotation = ctx.groupRotation
-			shapeHandle(property)
 			if (templateHandle) {
 				await templateHandle('container', obj, ctx)
 			}
+			shapeHandle(property)
 			let parentGroupFillStyle = ctx.groupFillStyle
 			let groupFillStyle = property.groupFillStyle
 			if (groupFillStyle) {
@@ -945,7 +946,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			} else if (paint.type == 'pattern') {
 				// 图案
 				let pattern = paint.pattern
-				let prst = pattern.prst
+				// let prst = pattern.prst
 				let fgColor = pattern.fgColor.realColor
 				let bgColor = pattern.bgColor.realColor
 				let width = anchor[2], height = anchor[3]

@@ -156,6 +156,7 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
                 anchor: [_x, _y - 8, _iw, _iw]
             })
             _x += (_iw + 2)
+            ctx.fillStyle = 'rgb(89, 89, 89)'
             let str = vTexts[vTexts.length - 1 - i]
             ctx.fillText(str, _x, _y)
             _x += ctx.measureText(str).width
@@ -225,6 +226,7 @@ async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx
     for (let i = 0; i < categorys.length; i++) {
         if (categoryAxis && !categoryAxis.deleted) {
             let _cx = (categoryWidth + catGap) * i + categoryWidth / 2 - ctx.measureText(categorys[i]).width / 2
+            ctx.fillStyle = 'rgb(89, 89, 89)'
             ctx.fillText(categorys[i], x + _cx, y + anchor[3] * 0.055)
         }
         for (let j = 0; j < series.length; j++) {
@@ -260,6 +262,7 @@ async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx
                 anchor: [_x, _y - 8, _iw, _iw]
             })
             _x += (_iw + 2)
+            ctx.fillStyle = 'rgb(89, 89, 89)'
             ctx.fillText(vTexts[i], _x, _y)
             _x += ctx.measureText(vTexts[i]).width
             _x += vGap
@@ -323,7 +326,7 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
         ctx.arc(x + centerX, y + centerY, radius, startAngle, startAngle + sliceAngle, false)
         if (holeSize > 0) {
             // 空心圆
-            let holeRadius = (1 - holeSize) * radius
+            let holeRadius = radius * holeSize
             ctx.arc(x + centerX, y + centerY, holeRadius, startAngle + sliceAngle, startAngle, true)
             ctx.closePath()
             ctx.save()
@@ -361,6 +364,7 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
                 anchor: [_x, _y - 8, _iw, _iw]
             })
             _x += (_iw + 2)
+            ctx.fillStyle = 'rgb(89, 89, 89)'
             ctx.fillText(vTexts[i], _x, _y)
             _x += ctx.measureText(vTexts[i]).width
             _x += vGap
@@ -500,6 +504,7 @@ async function drawLineChart(title, chartData, legend, anchor, canvas, ctx) {
             ctx.lineTo(_x + _iw, _y - 4)
             ctx.stroke()
             _x += (_iw + 2)
+            ctx.fillStyle = 'rgb(89, 89, 89)'
             ctx.fillText(vTexts[i], _x, _y)
             _x += ctx.measureText(vTexts[i]).width
             _x += vGap
@@ -551,9 +556,7 @@ async function drawRect(ctx, property) {
         ctx.lineWidth = property.strokeStyle.lineWidth || 1
         ctx.strokeStyle = await toCtxPaint(ctx, property.strokeStyle.paint, property.anchor)
     }
-    ctx.rect(property.anchor[0], property.anchor[1], property.anchor[2], property.anchor[3])
-    ctx.fill()
-    ctx.stroke()
+    ctx.fillRect(property.anchor[0], property.anchor[1], property.anchor[2], property.anchor[3])
 }
 
 function toCtxPaint(ctx, paint, anchor, isBackground, defaultColor) {
@@ -625,8 +628,8 @@ function toCtxPaint(ctx, paint, anchor, isBackground, defaultColor) {
         } else if (paint.type == 'texture') {
             // 图片或纹理
             let texture = paint.texture
-            loadImage(texture.imageData).then(img => {
-                let pat = createCtxTexturePattern(ctx, img, texture, anchor, isBackground)
+            loadChartImage(texture.imageData).then(img => {
+                let pat = createCtxTexturePattern(ctx, img, texture, anchor)
                 resolve(pat)
             })
         } else if (paint.type == 'pattern') {
@@ -792,7 +795,7 @@ function toColor(colorObj, defaultColor) {
     return `rgba(${r}, ${g}, ${b}, ${a})`
 }
 
-function loadImage(src) {
+function loadChartImage(src) {
     return new Promise(resolve => {
         if (!src) {
             resolve()

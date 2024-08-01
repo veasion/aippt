@@ -60,6 +60,19 @@
         <ul id="pageList"></ul>
         <span>编辑模式：</span>
         <input id="mode_checkbox" type="checkbox" checked onchange="changeMode()" />
+        <select id="insert_element" style="display: none;margin-left: 10px" onchange="insertElement(this.value.split(',')[0], this.value.split(',')[1])">
+            <option value="">-- 插入元素 --</option>
+            <option value="text,title1">插入大标题</option>
+            <option value="text,title2">插入副标题</option>
+            <option value="text,content">插入正文文本</option>
+            <option value="image">插入图片</option>
+            <option value="geometry">插入随机形状</option>
+            <option value="table">插入表格</option>
+            <option value="chart,bar">插入柱状图</option>
+            <option value="chart,pie">插入饼图</option>
+            <option value="chart,doughnut">插入环形图</option>
+            <option value="chart,line">插入折线图</option>
+        </select>
     </div>
     <div id="container" style="margin-top: 10px;">
         <svg id="ppt_svg"></svg>
@@ -68,8 +81,9 @@
 <script src="static/chart.js"></script>
 <script src="static/geometry.js"></script>
 <script src="static/ppt2svg.js"></script>
+<script src="static/element.js"></script>
 <script>
-    const apiKey = '17t2c9ma8a3ceo0ks'
+    const apiKey = '26h1kms70ar4e60iz'
     var editor = new JSONEditor(document.querySelector('#json'), {}, {})
 
     var pptxObj = null
@@ -189,6 +203,7 @@
         pptxObj = _pptxObj
         document.getElementById('download_json').style.display = 'inline'
         document.getElementById('download_pptx').style.display = 'inline'
+        document.getElementById('insert_element').style.display = document.getElementById('mode_checkbox').checked ? 'inline-block' : 'none'
         let pageList = document.getElementById('pageList')
         pageList.innerHTML = '';
         for (let i = 0; i < pptxObj.pages.length; i++) {
@@ -217,6 +232,7 @@
 
     function changeMode() {
         ppt2svg.setMode(document.getElementById('mode_checkbox').checked ? 'edit' : 'view')
+        document.getElementById('insert_element').style.display = pptxObj && document.getElementById('mode_checkbox').checked ? 'inline-block' : 'none'
     }
 
     ppt2svg.onchange = (elementObj) => {
@@ -224,5 +240,65 @@
     }
 
     changeMode()
+
+    function insertElement(type, subType) {
+        let element = null
+        if (type == 'text') {
+            // 文本
+           element = createTextBox(subType)
+        } else if (type == 'image') {
+            // 图片
+            let input = document.createElement('input')
+            input.type = 'file'
+            input.accept = '.jpg,.png'
+            input.onchange = function(e1) {
+                const file = e1.target.files[0]
+                if (!file) return
+                const reader = new FileReader()
+                reader.onload = function(e2) {
+                    const base64 = e2.target.result
+                    const img = new Image()
+                    img.src = base64
+                    img.onload = function() {
+                        const width = img.width > 300 ? 300 : img.width
+                        const height = img.height * (width / img.width)
+                        element = createImage(base64, width, height)
+                        pptxObj.pages[selectIdx].children.push(element)
+                        ppt2svg.drawPptx(pptxObj, selectIdx)
+                    }
+                }
+                reader.readAsDataURL(file)
+            }
+            input.click()
+        } else if (type == 'geometry') {
+            // 形状
+            let geometryName = subType
+            if (!geometryName) {
+                // 随机形状
+                let keys = Object.keys(geometryMap)
+                geometryName = keys[Math.floor(Math.random() * keys.length)]
+                console.log('geometry', geometryName)
+            }
+            element = createGeometry(geometryName)
+        } else if (type == 'table') {
+            // 表格
+            let rowColumnDataList = [['第1行1列', '第1行2列', '第1行3列'], ['第2行1列', '第2行2列', '第2行3列'], ['第3行1列', '第3行2列', '第3行3列']]
+            element = createTable(rowColumnDataList)
+        } else if (type == 'chart') {
+            // 图表
+            let rowColumnDataList = []
+            if (subType == 'pie' || subType == 'doughnut') {
+                rowColumnDataList = [[' ','销售额'], ['第一季度','8.2'], ['第二季度','3.2'], ['第三季度','1.4'], ['第四季度','1.2']]
+            } else {
+                rowColumnDataList = [[' ','系列 1','系列 2','系列 3'], ['类别 1','4.3','2.4','2'], ['类别 2','2.5','4.4','2'], ['类别 3','3.5','1.8','3'], ['类别 4','4.5','2.8','5']]
+            }
+            element = createChart('图表标题', subType, rowColumnDataList)
+        }
+        if (element) {
+            pptxObj.pages[selectIdx].children.push(element)
+            ppt2svg.drawPptx(pptxObj, selectIdx)
+        }
+        document.getElementById('insert_element').value = ''
+    }
 </script>
 </html>

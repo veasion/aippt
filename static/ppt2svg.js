@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // import { geometryPaths } from './geometry.js'
 // import { drawChart } from './chart.js'
 
@@ -70,6 +71,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
     var pointList = []
     var mTimer = null
     var currentPoint = null
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const $this = this
 
     const svg = d3.select((typeof _svg == 'string') ? ('#' + _svg) : _svg)
@@ -274,7 +276,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
     }
 
     function drawElement(obj, parent) {
-        if (obj.noDraw || !obj.extInfo.property.anchor) {
+        if (obj.noDraw || !obj.extInfo.property.anchor || obj.extInfo.property.hidden) {
             // console.log('ignore element:', obj)
             return
         }
@@ -968,7 +970,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                     data[i + 2] = gray * b + (1 - gray) * prst
                 }
                 patternCtx.putImageData(imageData, 0, 0)
-            } catch(e) {}
+            } catch(e) { /* empty */ }
         }
         // let mode = texture.alignment ? 'repeat' : 'no-repeat'
         let imgSrc = patternCanvas.toDataURL('image/png')
@@ -1195,12 +1197,25 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                 point[0] = point[0] + tx
                 point[1] = point[1] + ty
                 let anchor = obj.extInfo.property.anchor
-                anchor[0] = anchor[0] + tx * (anchor[2] / point[2])
-                anchor[1] = anchor[1] + ty * (anchor[3] / point[3])
+                if (point !== anchor) {
+                    anchor[0] = anchor[0] + tx * (anchor[2] / point[2])
+                    anchor[1] = anchor[1] + ty * (anchor[3] / point[3])
+                }
                 let interiorAnchor = obj.extInfo.property.interiorAnchor
                 if (interiorAnchor) {
                     interiorAnchor[0] = interiorAnchor[0] + tx * (interiorAnchor[2] / point[2])
                     interiorAnchor[1] = interiorAnchor[1] + ty * (interiorAnchor[3] / point[3])
+                }
+                if (obj.type == 'table') {
+                    let rows = obj.children || []
+                    for (let i = 0; i < rows.length; i++) {
+                        let columns = rows[i].children || []
+                        for (let j = 0; j < columns.length; j++) {
+                            let columnAnchor = columns[j].extInfo.property.anchor
+                            columnAnchor[0] = columnAnchor[0] + tx
+                            columnAnchor[1] = columnAnchor[1] + ty
+                        }
+                    }
                 }
             }
             let tx = 0, ty = 0
@@ -1289,8 +1304,10 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         textarea.style.resize = 'none'
         textarea.style.overflow = 'hidden'
         textarea.style.outline = '1px dashed #f35858'
-        textarea.style.left = rect.x + 'px'
-        textarea.style.top = rect.y + 'px'
+        let scrollY = window.scrollY || document.documentElement.scrollTop
+        let scrollX = window.scrollX || document.documentElement.scrollLeft
+        textarea.style.left = (rect.x + scrollX) + 'px'
+        textarea.style.top = (rect.y + scrollY) + 'px'
         let isMultiLine = rect.height >= fontSize * 2
         let textWordWrap = textObj.extInfo.property.textWordWrap
         if (isMultiLine) {
@@ -1410,6 +1427,36 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                 removePoint()
             }
         }, 10)
+    })
+    d3.addEventListener('document', 'keydown', function (event) {
+        if (!currentPoint) {
+            return
+        }
+        let obj = currentPoint.obj
+        if (!obj.point || obj.type == 'tableColumn') {
+            return
+        }
+        let gNode = document.getElementById('g-' + obj.id)
+        if (!gNode) {
+            return
+        }
+        if (event.keyCode == 46 && confirm(`确认删除 ${obj.type} 元素吗？`)) {
+            recursion(page.children, element => {
+                if (obj.id == element.id) {
+                    const children = element.pid ? idMap[element.pid].children : page.children
+                    for (let i = 0; i < children.length; i++) {
+                        if (children[i].id == element.id) {
+                            children.splice(i, 1)
+                            delete idMap[obj.id]
+                            gNode.remove()
+                            currentPoint = null
+                            calcPointList(page)
+                            break
+                        }
+                    }
+                }
+            })
+        }
     })
     d3.addEventListener('window', 'scroll', function() {
         removePoint()
