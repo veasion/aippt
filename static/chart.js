@@ -47,7 +47,7 @@ async function drawChart(chart, anchor, canvas, ctx) {
             anchor: [anchor[0] + 0.5, anchor[1] + 0.5, anchor[2] - 1, anchor[3] - 1]
         })
         let str = '该图表暂不支持渲染'
-        ctx.font = '16px 等线'
+        ctx.font = `${Math.min(anchor[2] * 0.056, 16)}px 等线`
         ctx.fillStyle = 'rgb(153, 153, 153)'
         let textWidth = ctx.measureText(str).width
         ctx.fillText(str, anchor[0] + anchor[2] / 2 - textWidth / 2, anchor[1] + anchor[3] / 2 - 8)
@@ -57,7 +57,7 @@ async function drawChart(chart, anchor, canvas, ctx) {
 
 async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx) {
     if (title) {
-        ctx.font = '18.5px 等线'
+        ctx.font = `${Math.min(anchor[3] * 0.064, 18.5)}px 等线`
         ctx.fillStyle = 'rgb(89, 89, 89)'
         let textWidth = ctx.measureText(title).width
         ctx.fillText(title, anchor[0] + anchor[2] / 2 - textWidth / 2, anchor[1] + anchor[3] * 0.06)
@@ -81,7 +81,7 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
     let ticks = calculateTicks(minValue, maxValue, minTicks, 11)
     let xGap = xWidth / (ticks.length - 1)
     ctx.lineWidth = 0.5
-    ctx.font = '14px 等线'
+    ctx.font = `${Math.min(anchor[2] * 0.048, 14)}px 等线`
     ctx.fillStyle = 'rgb(89, 89, 89)'
     ctx.strokeStyle = 'rgb(217, 217, 217)'
     ctx.beginPath()
@@ -118,7 +118,7 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
         if (categoryAxis && !categoryAxis.deleted) {
             let _cy = (categoryHeight + catGap) * i + categoryHeight / 2 + 6
             ctx.textAlign = 'right'
-            ctx.fillText(categorys[categorys.length - 1 - i], x - 10, y + _cy)
+            ctx.fillText(categorys[categorys.length - 1 - i], x - anchor[2] * 0.02, y + _cy)
             ctx.textAlign = 'start'
         }
         for (let j = 0; j < series.length; j++) {
@@ -146,16 +146,16 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
             vTextWidth += ctx.measureText(s).width
         }
         vGap = anchor[3] * 0.03
-        let _iw = 8
+        let _iw = anchor[2] * 0.028
         let _y = y + yHeight + anchor[3] * 0.1
-        let _x = x + xWidth / 2 - (vTextWidth + vGap * (vTexts.length - 1) + (_iw + 2) * vTexts.length) / 2
+        let _x = x + xWidth / 2 - (vTextWidth + vGap * (vTexts.length - 1) + (_iw * 1.25) * vTexts.length) / 2
         for (let i = 0; i < vTexts.length; i++) {
             await drawRect(ctx, {
                 fillStyle: series[series.length - 1 - i].property.fillStyle,
                 strokeStyle: series[series.length - 1 - i].property.strokeStyle,
-                anchor: [_x, _y - 8, _iw, _iw]
+                anchor: [_x, _y - _iw, _iw, _iw]
             })
-            _x += (_iw + 2)
+            _x += (_iw * 1.25)
             ctx.fillStyle = 'rgb(89, 89, 89)'
             let str = vTexts[vTexts.length - 1 - i]
             ctx.fillText(str, _x, _y)
@@ -167,7 +167,7 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
 
 async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx) {
     if (title) {
-        ctx.font = '18.5px 等线'
+        ctx.font = `${Math.min(anchor[3] * 0.09, 18.5)}px 等线`
         ctx.fillStyle = 'rgb(89, 89, 89)'
         let textWidth = ctx.measureText(title).width
         ctx.fillText(title, anchor[0] + anchor[2] / 2 - textWidth / 2, anchor[1] + anchor[3] * 0.06)
@@ -191,7 +191,7 @@ async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx
     let ticks = calculateTicks(minValue, maxValue, mixTicks, 11)
     let yGap = yHeight / (ticks.length - 1)
     ctx.lineWidth = 0.5
-    ctx.font = '14px 等线'
+    ctx.font = `${Math.min(anchor[3] * 0.07, 14)}px 等线`
     ctx.fillStyle = 'rgb(89, 89, 89)'
     ctx.strokeStyle = 'rgb(217, 217, 217)'
     ctx.beginPath()
@@ -252,16 +252,16 @@ async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx
             vTextWidth += ctx.measureText(s).width
         }
         vGap = anchor[2] * 0.02
-        let _iw = 8
+        let _iw = anchor[2] * 0.028
         let _y = y + anchor[3] * 0.125
-        let _x = x + xWidth / 2 - (vTextWidth + vGap * (vTexts.length - 1) + (_iw + 2) * vTexts.length) / 2
+        let _x = x + xWidth / 2 - (vTextWidth + vGap * (vTexts.length - 1) + (_iw * 1.25) * vTexts.length) / 2
         for (let i = 0; i < vTexts.length; i++) {
             await drawRect(ctx, {
                 fillStyle: series[i].property.fillStyle,
                 strokeStyle: series[i].property.strokeStyle,
-                anchor: [_x, _y - 8, _iw, _iw]
+                anchor: [_x, _y - _iw, _iw, _iw]
             })
-            _x += (_iw + 2)
+            _x += (_iw * 1.25)
             ctx.fillStyle = 'rgb(89, 89, 89)'
             ctx.fillText(vTexts[i], _x, _y)
             _x += ctx.measureText(vTexts[i]).width
@@ -275,7 +275,7 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
         title = chartData.series[0].text.data[0]
     }
     if (title) {
-        ctx.font = '18.5px 等线'
+        ctx.font = `${Math.min(anchor[2] * 0.064, 18.5)}px 等线`
         ctx.fillStyle = 'rgb(89, 89, 89)'
         let textWidth = ctx.measureText(title).width
         ctx.fillText(title, anchor[0] + anchor[2] / 2 - textWidth / 2, anchor[1] + anchor[3] * 0.06)
@@ -299,7 +299,7 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
     let centerY = yHeight / 2
     let radius = Math.min(centerX, centerY)
     ctx.lineWidth = 0.5
-    ctx.font = '14px 等线'
+    ctx.font = `${Math.min(anchor[2] * 0.048, 14)}px 等线`
     ctx.fillStyle = 'rgb(89, 89, 89)'
     ctx.save()
     ctx.translate(x + centerX, y + centerY)
@@ -353,17 +353,17 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
             vTextWidth += ctx.measureText(s).width
         }
         let vGap = anchor[2] * 0.03
-        let _iw = 8
+        let _iw = anchor[2] * 0.028
         let _y = y + yHeight + anchor[3] * 0.125
-        let _x = x + xWidth / 2 - (vTextWidth + vGap * (vTexts.length - 1) + (_iw + 2) * vTexts.length) / 2
+        let _x = x + xWidth / 2 - (vTextWidth + vGap * (vTexts.length - 1) + (_iw * 1.25) * vTexts.length) / 2
         for (let i = 0; i < vTexts.length; i++) {
             let property = dataPoints[i].property
             await drawRect(ctx, {
                 fillStyle: property.fillStyle,
                 strokeStyle: property.strokeStyle,
-                anchor: [_x, _y - 8, _iw, _iw]
+                anchor: [_x, _y - _iw, _iw, _iw]
             })
-            _x += (_iw + 2)
+            _x += (_iw * 1.25)
             ctx.fillStyle = 'rgb(89, 89, 89)'
             ctx.fillText(vTexts[i], _x, _y)
             _x += ctx.measureText(vTexts[i]).width
@@ -374,7 +374,7 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
 
 async function drawLineChart(title, chartData, legend, anchor, canvas, ctx) {
     if (title) {
-        ctx.font = '18.5px 等线'
+        ctx.font = `${Math.min(anchor[3] * 0.09, 18.5)}px 等线`
         ctx.fillStyle = 'rgb(89, 89, 89)'
         let textWidth = ctx.measureText(title).width
         ctx.fillText(title, anchor[0] + anchor[2] / 2 - textWidth / 2, anchor[1] + anchor[3] * 0.06)
@@ -398,7 +398,7 @@ async function drawLineChart(title, chartData, legend, anchor, canvas, ctx) {
     let ticks = calculateTicks(minValue, maxValue, 5, 10)
     let yGap = yHeight / (ticks.length - 1)
     ctx.lineWidth = 0.5
-    ctx.font = '14px 等线'
+    ctx.font = `${Math.min(anchor[3] * 0.07, 14)}px 等线`
     ctx.fillStyle = 'rgb(89, 89, 89)'
     ctx.strokeStyle = 'rgb(217, 217, 217)'
     ctx.beginPath()
@@ -560,6 +560,7 @@ async function drawRect(ctx, property) {
 }
 
 function toCtxPaint(ctx, paint, anchor, isBackground, defaultColor) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return new Promise((resolve, reject) => {
         if (!paint) {
             resolve(defaultColor || 'transparent')
@@ -628,13 +629,13 @@ function toCtxPaint(ctx, paint, anchor, isBackground, defaultColor) {
             // 图片或纹理
             let texture = paint.texture
             loadChartImage(texture.imageData).then(img => {
-                let pat = createCtxTexturePattern(ctx, img, texture, anchor, isBackground)
+                let pat = createCtxTexturePattern(ctx, img, texture, anchor)
                 resolve(pat)
             })
         } else if (paint.type == 'pattern') {
             // 图案
             let pattern = paint.pattern
-            let prst = pattern.prst
+            // let prst = pattern.prst
             let fgColor = pattern.fgColor.realColor
             let bgColor = pattern.bgColor.realColor
             let width = anchor[2], height = anchor[3]
@@ -675,7 +676,7 @@ function toCtxPaint(ctx, paint, anchor, isBackground, defaultColor) {
     })
 }
 
-function createCtxTexturePattern(ctx, img, texture, anchor, isBackground) {
+function createCtxTexturePattern(ctx, img, texture, anchor) {
     let width = anchor[2]
     let height = anchor[3]
     let mode = texture.alignment ? 'repeat' : 'no-repeat'

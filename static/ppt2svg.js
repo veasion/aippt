@@ -66,6 +66,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
     var ctx = {}
     var idMap = {}
     var counter = 0
+    var zoom = 1
     var defs = null
     var mode = 'view'
     var pointList = []
@@ -85,9 +86,9 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         counter = 0
         pptx = pptxObj
         pageIndex = pageIdx
+        zoom = svgWidth / pptx.width
         svg.html('')
         defs = svg.append('defs')
-        svg.attr('viewBox', `0 0 ${pptxObj.width || 960} ${pptxObj.height || 540}`)
         page = pptxObj.pages[pageIdx]
         let placeholder = {}
         let slideMasterIdx = page.extInfo.slideMasterIdx
@@ -132,9 +133,12 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         return svg.node()
     }
 
-    this.resetSize = (svgWidth, svgHeight) => {
-        svg.attr('width', svgWidth || 960).attr('height', svgHeight || 540)
+    this.resetSize = (_svgWidth, _svgHeight) => {
+        svgWidth = _svgWidth || svgWidth
+        svgHeight = _svgHeight || svgHeight
+        svg.attr('width', svgWidth).attr('height', svgHeight)
         if (pptx) {
+            zoom = svgWidth / pptx.width
             this.drawPptx(pptx, pageIndex)
         }
     }
@@ -145,9 +149,17 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         return mode
     }
 
+    function scaleAnchor(point) {
+        return point ? [...point.map(s => s * zoom)] : point
+    }
+
+    function scaleValue(value) {
+        return value ? value * zoom : value
+    }
+
     function shapeHandle(property, parent, isText) {
         let g = parent.append('g')
-        let anchor = property.anchor
+        let anchor = scaleAnchor(property.anchor)
         if (!anchor) {
             return g
         }
@@ -200,7 +212,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
             }
         }
         // 嵌套容器 Group
-        let interior = property.interiorAnchor
+        let interior = scaleAnchor(property.interiorAnchor)
         if (interior && interior.length > 0) {
             let scaleX = interior[2] == 0 || anchor[2] == interior[2] ? 1 : anchor[2] / interior[2]
             let scaleY = interior[3] == 0 || anchor[3] == interior[3] ? 1 : anchor[3] / interior[3]
@@ -225,13 +237,14 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
             ctx.bgFillStyle = null
             return
         }
-        ctx.bgAnchor = background.anchor
+        let anchor = scaleAnchor(background.anchor)
+        ctx.bgAnchor = anchor
         ctx.bgFillStyle = background.fillStyle
-        let fill = toPaint(background.fillStyle, background.anchor)
+        let fill = toPaint(background.fillStyle, anchor)
         svg.append('rect')
             .attr('x', 0).attr('y', 0)
-            .attr('width', background.anchor[2])
-            .attr('height', background.anchor[3])
+            .attr('width', anchor[2])
+            .attr('height', anchor[3])
             .attr('fill', fill)
     }
 
@@ -328,7 +341,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
             return
         }
         let property = obj.extInfo.property
-        let anchor = property.anchor
+        let anchor = scaleAnchor(property.anchor)
         let wordWrap = property.textWordWrap
         let textInsets = property.textInsets || [0, 0, 0, 0]
         let isVertical = property.textDirection && property.textDirection.indexOf('VERTICAL') > -1
@@ -338,7 +351,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         if (isVertical) {
             textNode.style('writing-mode', 'vertical-rl')
         }
-        let marginTop = property.strokeStyle ? (property.strokeStyle.lineWidth || 1) : 0
+        let marginTop = property.strokeStyle ? scaleValue(property.strokeStyle.lineWidth || 1) : 0
         let maxFontSize = 0
         let maxWidth = anchor[2] - textInsets[1] - textInsets[3]
         for (let i = 0; i < obj.children.length; i++) {
@@ -367,6 +380,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                 if (r_property.slideNum) {
                     r.text = (pageIndex + 1) + ''
                 }
+                let fontSize = scaleValue(r_property.fontSize || 16)
                 let createRNode = (_pNode) => {
                     let rNode = _pNode.append('tspan').attr('id', r.id)
                     if (r_property.bold) {
@@ -378,7 +392,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                     if (r_property.underlined) {
                         rNode.style('text-decoration', 'underline')
                     }
-                    rNode.style('font-size', (r_property.fontSize || 16) + 'px')
+                    rNode.style('font-size', fontSize + 'px')
                     rNode.style('font-family', (r_property.fontFamily || '等线'))
                     let filter = toShadow(r_property.shadow, anchor)
                     if (filter) {
@@ -388,15 +402,20 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                         let fillStyle = toPaint(r_property.line.paint, anchor)
                         rNode.attr('fill', 'none')
                         rNode.attr('stroke', fillStyle)
-                        rNode.attr('stroke-width', r_property.line.lineWidth || 1)
+                        rNode.attr('stroke-width', scaleValue(r_property.line.lineWidth || 1))
                     } else {
-                        let fillStyle = toPaint(r_property.fontColor, anchor)
+                        let params = {}
+                        if (r_property.fontColor.type == 'texture') {
+                            params.tx = anchor[0]
+                            params.ty = anchor[1] + marginTop
+                        }
+                        let fillStyle = toPaint(r_property.fontColor, anchor, params)
                         rNode.attr('fill', fillStyle)
                     }
                     addRunTextEvent(rNode, obj)
                     return rNode
                 }
-                maxFontSize = Math.max(r_property.fontSize || 16, maxFontSize)
+                maxFontSize = Math.max(fontSize, maxFontSize)
                 let rNode = createRNode(pNode)
                 if (isVertical) {
                     // 竖版
@@ -467,15 +486,15 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
     }
 
     function drawTableColumn(property, parent) {
-        let anchor = property.anchor
+        let anchor = scaleAnchor(property.anchor)
         let x = anchor[0] - 1
         let endX = anchor[0] + anchor[2] + 1
         let y = anchor[1] - 1
         let endY = anchor[1] + anchor[3] + 1
-        let borders = property.borders // top/left/bottom/right
+        let borders = scaleAnchor(property.borders) // top/left/bottom/right
         // top
         let top = borders[0]
-        let lineWidth = top.lineWidth
+        let lineWidth = scaleValue(top.lineWidth)
         let stroke = toColor({ color: top.color }, 'white')
         parent.append('line')
                 .attr('x1', x).attr('y1', y)
@@ -483,7 +502,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                 .attr('style', `stroke: ${stroke};stroke-width: ${lineWidth}`)
         // right
         let right = borders[3]
-        lineWidth = right.lineWidth
+        lineWidth = scaleValue(right.lineWidth)
         stroke = toColor({ color: right.color }, 'white')
         parent.append('line')
                     .attr('x1',endX).attr('y1', y)
@@ -491,7 +510,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                     .attr('style', `stroke: ${stroke};stroke-width: ${lineWidth}`)
         // bottom
         let bottom = borders[2]
-        lineWidth = bottom.lineWidth
+        lineWidth = scaleValue(bottom.lineWidth)
         stroke = toColor({ color: bottom.color }, 'white')
         parent.append('line')
                     .attr('x1',endX).attr('y1', endY)
@@ -499,14 +518,14 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                     .attr('style', `stroke: ${stroke};stroke-width: ${lineWidth}`)
         // left
         let left = borders[1]
-        lineWidth = left.lineWidth
+        lineWidth = scaleValue(left.lineWidth)
         stroke = toColor({ color: left.color }, 'white')
         parent.append('line')
                     .attr('x1',x).attr('y1', endY)
                     .attr('x2', x).attr('y2', y)
                     .attr('style', `stroke: ${stroke};stroke-width: ${lineWidth}`)
         if (property.fillStyle) {
-            let fill = toPaint(property.fillStyle, property.anchor)
+            let fill = toPaint(property.fillStyle, anchor)
             parent.append('rect')
             .attr('x', anchor[0]).attr('y', anchor[1])
             .attr('width', anchor[2])
@@ -518,9 +537,10 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
 
     function drawDiagram(obj, parent) {
         let property = obj.extInfo.property
+        let anchor = scaleAnchor(property.anchor)
         let g = parent.append('g').attr('id', obj.id).attr('id', 'g-' + obj.id)
         addElementEvent(g, obj)
-        g.attr('transform', `translate(${property.anchor[0]}, ${property.anchor[1]})`)
+        g.attr('transform', `translate(${anchor[0]}, ${anchor[1]})`)
         for (let i = 0; i < obj.children.length; i++) {
             drawElement(obj.children[i], g)
         }
@@ -539,7 +559,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
             let groupFillStyle = property.groupFillStyle
             if (groupFillStyle) {
                 groupFillStyle = JSON.parse(JSON.stringify(groupFillStyle))
-                groupFillStyle.groupAnchor = property.anchor
+                groupFillStyle.groupAnchor = scaleAnchor(property.anchor)
                 if (parentGroupFillStyle) {
                     groupFillStyle.parentGroupFillStyle = parentGroupFillStyle
                 }
@@ -594,11 +614,11 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
 
     function drawGraphicFrame(obj, parent) {
         let property = obj.extInfo.property
-        let anchor = property.anchor
+        let anchor = scaleAnchor(property.anchor)
         let g = parent.append('g').attr('id', 'g-' + obj.id)
         addElementEvent(g, obj)
         if (property.chart && property.chart.chartData && property.chart.chartData.length > 0) {
-            drawChart(property.chart, [0, 0, property.anchor[2], property.anchor[3]]).then(canvas => {
+            drawChart(property.chart, [0, 0, anchor[2], anchor[3]]).then(canvas => {
                 let imgSrc = canvas.toDataURL('image/png')
                 let fill = toPaint({ 'type': 'texture', texture: { 'imageData': imgSrc } }, anchor)
                 g.append('rect')
@@ -633,14 +653,14 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         if (!parent) {
             parent = svg
         }
-        let anchor = property.anchor
+        let anchor = scaleAnchor(property.anchor)
         let stroke = null
-        let lineWidth = 1
+        let lineWidth = scaleValue(1)
         if (property.strokeStyle) {
-            lineWidth = property.strokeStyle.lineWidth || 1
+            lineWidth = scaleValue(property.strokeStyle.lineWidth || 1)
             stroke = toPaint(property.strokeStyle.paint, anchor)
         }
-        let paths = geometryPaths(property)
+        let paths = geometryPaths(property, zoom)
         for (let i = 0; i < paths.length; i++) {
             let path = paths[i]
             let pathNode = parent.append('path')
@@ -695,10 +715,11 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         scaleX = scaleX || 1
         scaleY = scaleY || 1
         let stdDeviation = (shadow.blur || 0) / Math.max(scaleX, scaleY) / 5
+        let distance = scaleValue(shadow.distance)
         let color = toColor(shadow.fillStyle.color)
         let filterId = 'shadow' + (++counter)
         let filter = defs.append('filter').attr('id', filterId)
-        if (anchor && shadow.distance && (shadow.distance >= anchor[2] / 2 || shadow.distance >= anchor[3] / 2)) {
+        if (anchor && distance && (distance >= anchor[2] / 2 || distance >= anchor[3] / 2)) {
             filter.attr('x', '-100%').attr('y', '-100%').attr('width', '400%').attr('height', '400%')
         } else {
             filter.attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%')
@@ -706,11 +727,11 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         filter.append('feGaussianBlur').attr('in', 'SourceAlpha').attr('stdDeviation', stdDeviation).attr('result', 'blur')
         filter.append('feFlood').attr('flood-color', color).attr('result', 'color')
         filter.append('feComposite').attr('in', 'color').attr('in2', 'blur').attr('operator', 'in').attr('result', 'shadow')
-        if (shadow.distance) {
+        if (distance) {
             let radians = (shadow.angle || 0) * Math.PI / 180
             let x = 0, y = 0
-            let rx = shadow.distance / scaleX
-            let ry = shadow.distance / scaleY
+            let rx = distance / scaleX
+            let ry = distance / scaleY
             let shadowOffsetX = x + rx * Math.cos(radians)
             let shadowOffsetY = y + ry * Math.sin(radians)
             filter.append('feOffset').attr('dx', shadowOffsetX).attr('dy', shadowOffsetY).attr('result', 'offsetBlur')
@@ -741,8 +762,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
             // 组合背景
             let groupFillStyle = paint.parentGroupFillStyle || ctx.groupFillStyle
             if (groupFillStyle) {
-                // return toPaint(groupFillStyle, anchor || groupFillStyle.groupAnchor, params)
-                return toPaint(groupFillStyle, groupFillStyle.groupAnchor || anchor, params)
+                return toPaint(groupFillStyle, scaleAnchor(groupFillStyle.groupAnchor) || anchor, params)
             } else {
                 return 'transparent'
             }
@@ -830,7 +850,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         } else if (paint.type == 'pattern') {
             // 图案
             let pattern = paint.pattern
-            let prst = pattern.prst
+            // let prst = pattern.prst
             let fgColor = pattern.fgColor.realColor
             let bgColor = pattern.bgColor.realColor
             let width = anchor[2], height = anchor[3]
@@ -935,16 +955,19 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                 patternCtx.drawImage(img, x, y, w, h)
             }
         } else if (texture.alignment) {
-            let x = 0, y = 0
+            let x = 0, y = 0, scale = zoom
             if (texture.alignment == 'CENTER') {
-                if (width > anchor[2]) {
-                    x = (width - anchor[2]) / 2
+                if (width > anchor[2] / scale) {
+                    x = (width - anchor[2] / scale) / 2
                 }
-                if (height > anchor[3]) {
-                    y = (height - anchor[3]) / 2
+                if (height > anchor[3] / scale) {
+                    y = (height - anchor[3] / scale) / 2
                 }
             }
-            patternCtx.drawImage(img, x, y, width, height, 0, 0, width, height)
+            if (!x && !y) {
+                scale = Math.max(scale, 1)
+            }
+            patternCtx.drawImage(img, x, y, width, height, 0, 0, width * scale, height * scale)
         } else {
             if (imgInsets) {
                 patternCtx.drawImage(img, imgInsets[0], imgInsets[1], imgInsets[2], imgInsets[3], 0, 0, width, height)
@@ -1091,37 +1114,24 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
     }
 
     function calcPointList(page) {
-        let svgNode = svg.node()
-        let svgRect = svgNode.getClientRects()[0]
-        if (!svgRect) {
-            return
-        }
         pointList = []
-        let svgScaleX = svgRect.width / pptx.width
-        let svgScaleY = svgRect.height / pptx.height
         recursion(page.children, c => {
             if (c.extInfo && c.extInfo.property && c.extInfo.property.anchor) {
-                let point = c.point
+                let point = scaleAnchor(c.point)
                 if (!point) {
-                    point = c.extInfo.property.anchor
+                    point = scaleAnchor(c.extInfo.property.anchor)
                 }
                 let _point
                 if (point[2] < 0.1) {
-                    let width = (c.extInfo.property.strokeStyle || {}).lineWidth || 1
+                    let width = scaleValue((c.extInfo.property.strokeStyle || {}).lineWidth || 1)
                     let x = point[0] - width / 2
                     _point = { x: x, endX: x + width, y: point[1], endY: point[1] + point[3], sort: width + point[3], obj: c }
                 } else if (point[3] < 0.1) {
-                    let height = (c.extInfo.property.strokeStyle || {}).lineWidth || 1
+                    let height = scaleValue((c.extInfo.property.strokeStyle || {}).lineWidth || 1)
                     let y = point[1] - height / 2
                     _point = { x: point[0], endX: point[0] + point[2], y: y, endY: y + height, sort: point[2] + height, obj: c }
                 } else {
                     _point = { x: point[0], endX: point[0] + point[2], y: point[1], endY: point[1] + point[3], sort: point[2] + point[3], obj: c }
-                }
-                if (svgScaleX != 1 || svgScaleY != 1) {
-                    _point.x *= svgScaleX
-                    _point.endX *= svgScaleX
-                    _point.y *= svgScaleY
-                    _point.endY *= svgScaleY
                 }
                 pointList.push(_point)
             }
@@ -1228,9 +1238,11 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                 document.onmousemove = null
                 document.onmouseup = null
                 if (tx || ty) {
-                    updateAnchor(obj, tx, ty)
+                    const real_tx = tx / zoom
+                    const real_ty = ty / zoom
+                    updateAnchor(obj, real_tx, real_ty)
                     if (obj != idMap[obj.id]) {
-                        updateAnchor(idMap[obj.id], tx, ty)
+                        updateAnchor(idMap[obj.id], real_tx, real_ty)
                     }
                     $this.drawPptx(pptx, pageIndex)
                 }
@@ -1264,8 +1276,6 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
             return
         }
         console.log('text edit', obj)
-        let svgRect = svg.node().getClientRects()[0]
-        let svgScale = svgRect.width / pptx.width
         let rect = null
         let nodeStyle = null
         let nodes = document.querySelectorAll(`tspan[id='${rId}']`)
@@ -1289,7 +1299,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         }
         rect.width = rect.endX - rect.x
         rect.height = rect.endY - rect.y
-        let fontSize = +nodeStyle.fontSize.replace('px', '') * svgScale
+        let fontSize = +nodeStyle.fontSize.replace('px', '')
         let textarea = document.getElementById('textarea_' + rId)
         if (textarea) {
             textarea.remove()
