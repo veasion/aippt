@@ -145,7 +145,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 
 	function calcTextHeight(obj) {
 		let totalTextHeight = 0
-		let wordWrap = obj.extInfo.property.textWordWrap
+		let wordWrap = obj.extInfo.property.textWordWrap ?? true
 		let textInsets = obj.extInfo.property.textInsets || [0, 0, 0, 0]
 		let wInset = textInsets[1] + textInsets[3]
 		for (let i = 0; i < obj.children.length; i++) {
@@ -212,7 +212,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		let underlined = false
 		let totalTextWidth = 0
 		let anchor = textObj.extInfo.property.anchor
-		let wordWrap = textObj.extInfo.property.textWordWrap
+		let wordWrap = textObj.extInfo.property.textWordWrap ?? true
 		for (let i = 0; i < p.children.length; i++) {
 			let r = p.children[i]
 			let property = r.extInfo.property
