@@ -342,7 +342,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         }
         let property = obj.extInfo.property
         let anchor = scaleAnchor(property.anchor)
-        let wordWrap = property.textWordWrap
+        let wordWrap = property.textWordWrap ?? true
         let textInsets = property.textInsets || [0, 0, 0, 0]
         let isVertical = property.textDirection && property.textDirection.indexOf('VERTICAL') > -1
         let verticalAlignment = property.textVerticalAlignment
@@ -1319,7 +1319,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         textarea.style.left = (rect.x + scrollX) + 'px'
         textarea.style.top = (rect.y + scrollY) + 'px'
         let isMultiLine = rect.height >= fontSize * 2
-        let textWordWrap = textObj.extInfo.property.textWordWrap
+        let textWordWrap = textObj.extInfo.property.textWordWrap ?? true
         if (isMultiLine) {
             textarea.style.width = rect.width + 'px'
             textarea.style.height = (rect.height + fontSize * 2) + 'px'
