@@ -71,7 +71,19 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
         minValue = Math.min(minValue, ...series[i].value.data)
         maxValue = Math.max(maxValue, ...series[i].value.data)
     }
-    let sGap = valueAxes && !valueAxes.deleted ? anchor[2] * 0.04 : anchor[2] * 0.15 // 开始间距
+    ctx.lineWidth = 0.5
+    ctx.font = `${Math.min(anchor[2] * 0.048, 14)}px 等线`
+    ctx.fillStyle = 'rgb(89, 89, 89)'
+    ctx.strokeStyle = 'rgb(217, 217, 217)'
+    let categorys = series[0].category.data
+    let maxCw = ctx.measureText('00').width
+    for (let i = 0; i < categorys.length; i++) {
+        let w = ctx.measureText(categorys[i] + '0').width
+        if (w > maxCw) {
+            maxCw = w
+        }
+    }
+    let sGap = valueAxes && !valueAxes.deleted ? maxCw : anchor[2] * 0.15
     let x = anchor[0] + sGap
     let xWidth = anchor[2] - sGap - anchor[2] * 0.04
     let startY = title ? anchor[3] * 0.12 : anchor[3] * 0.05
@@ -80,10 +92,6 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
     let minTicks = xWidth / 10 > 20 ? 11 : 6
     let ticks = calculateTicks(minValue, maxValue, minTicks, 11)
     let xGap = xWidth / (ticks.length - 1)
-    ctx.lineWidth = 0.5
-    ctx.font = `${Math.min(anchor[2] * 0.048, 14)}px 等线`
-    ctx.fillStyle = 'rgb(89, 89, 89)'
-    ctx.strokeStyle = 'rgb(217, 217, 217)'
     ctx.beginPath()
     for (let i = 0; i < ticks.length; i++) {
         // x轴数值
@@ -110,15 +118,15 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
     x = anchor[0] + sGap
     let vGap = anchor[3] * 0.015 // 柱子间距
     let catGap = vGap * 5 // 类目间距
-    let categorys = series[0].category.data
     let categoryHeight = (yHeight - catGap * (categorys.length - 1) - yGap * 2) / categorys.length
     let vHeight = (categoryHeight - vGap * (series.length - 1)) / series.length
     // 绘制类目和柱状图
     for (let i = 0; i < categorys.length; i++) {
         if (categoryAxis && !categoryAxis.deleted) {
+            ctx.fillStyle = 'rgb(89, 89, 89)'
             let _cy = (categoryHeight + catGap) * i + categoryHeight / 2 + 6
             ctx.textAlign = 'right'
-            ctx.fillText(categorys[categorys.length - 1 - i], x - anchor[2] * 0.02, y + _cy)
+            ctx.fillText(categorys[categorys.length - 1 - i], x - 4, y + _cy)
             ctx.textAlign = 'start'
         }
         for (let j = 0; j < series.length; j++) {
@@ -138,6 +146,7 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
     }
     if (legend) {
         // 绘制v标签标识
+        x = anchor[0] + sGap
         let vTexts = []
         let vTextWidth = 0
         for (let i = 0; i < series.length; i++) {
@@ -146,7 +155,7 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
             vTextWidth += ctx.measureText(s).width
         }
         vGap = anchor[3] * 0.03
-        let _iw = anchor[2] * 0.028
+        let _iw = Math.min(anchor[2] * 0.028, 15)
         let _y = y + yHeight + anchor[3] * 0.1
         let _x = x + xWidth / 2 - (vTextWidth + vGap * (vTexts.length - 1) + (_iw * 1.25) * vTexts.length) / 2
         for (let i = 0; i < vTexts.length; i++) {
@@ -167,7 +176,7 @@ async function drawBarChartWithBar(title, chartData, legend, anchor, canvas, ctx
 
 async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx) {
     if (title) {
-        ctx.font = `${Math.min(anchor[3] * 0.09, 18.5)}px 等线`
+        ctx.font = `${Math.min(anchor[3] * 0.07, 18.5)}px 等线`
         ctx.fillStyle = 'rgb(89, 89, 89)'
         let textWidth = ctx.measureText(title).width
         ctx.fillText(title, anchor[0] + anchor[2] / 2 - textWidth / 2, anchor[1] + anchor[3] * 0.06)
@@ -181,19 +190,19 @@ async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx
         minValue = Math.min(minValue, ...series[i].value.data)
         maxValue = Math.max(maxValue, ...series[i].value.data)
     }
-    let xGap = anchor[2] * 0.044 // x开始间距
-    let x = anchor[0] + xGap
-    let xWidth = anchor[2] - xGap * 1.5
+    ctx.lineWidth = 0.5
+    ctx.font = `${Math.min(anchor[3] * 0.06, 14)}px 等线`
+    ctx.fillStyle = 'rgb(89, 89, 89)'
+    ctx.strokeStyle = 'rgb(217, 217, 217)'
     let startY = title ? anchor[3] * 0.12 : anchor[3] * 0.05
     let y = anchor[1] + startY
     let yHeight = anchor[3] - startY - anchor[3] * 0.15
     let mixTicks = yHeight / 10 > 20 ? 11 : 6
     let ticks = calculateTicks(minValue, maxValue, mixTicks, 11)
+    let xGap = ctx.measureText(ticks[ticks.length - 1] + '00').width
+    let x = anchor[0] + xGap
+    let xWidth = anchor[2] - xGap * 1.5
     let yGap = yHeight / (ticks.length - 1)
-    ctx.lineWidth = 0.5
-    ctx.font = `${Math.min(anchor[3] * 0.07, 14)}px 等线`
-    ctx.fillStyle = 'rgb(89, 89, 89)'
-    ctx.strokeStyle = 'rgb(217, 217, 217)'
     ctx.beginPath()
     for (let i = 0; i < ticks.length; i++) {
         if (valueAxes && !valueAxes.deleted) {
@@ -204,7 +213,7 @@ async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx
             if (vs.indexOf('.') > -1 && vs.split('.')[1].length > 1) {
                 vs = v.toFixed(1)
             }
-            ctx.fillText(vs, x - 6, y + 6)
+            ctx.fillText(vs, x - 4, y + 6)
             ctx.textAlign = 'start'
         }
         if (extInfo.majorGridlines == 'true') {
@@ -244,6 +253,7 @@ async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx
     }
     if (legend) {
         // 绘制v标签标识
+        x = anchor[0] + xGap
         let vTexts = []
         let vTextWidth = 0
         for (let i = 0; i < series.length; i++) {
@@ -252,7 +262,7 @@ async function drawBarChartWithCol(title, chartData, legend, anchor, canvas, ctx
             vTextWidth += ctx.measureText(s).width
         }
         vGap = anchor[2] * 0.02
-        let _iw = anchor[2] * 0.028
+        let _iw = Math.min(anchor[2] * 0.025, 15)
         let _y = y + anchor[3] * 0.125
         let _x = x + xWidth / 2 - (vTextWidth + vGap * (vTexts.length - 1) + (_iw * 1.25) * vTexts.length) / 2
         for (let i = 0; i < vTexts.length; i++) {
@@ -275,7 +285,7 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
         title = chartData.series[0].text.data[0]
     }
     if (title) {
-        ctx.font = `${Math.min(anchor[2] * 0.064, 18.5)}px 等线`
+        ctx.font = `${Math.min(anchor[3] * 0.07, 18.5)}px 等线`
         ctx.fillStyle = 'rgb(89, 89, 89)'
         let textWidth = ctx.measureText(title).width
         ctx.fillText(title, anchor[0] + anchor[2] / 2 - textWidth / 2, anchor[1] + anchor[3] * 0.06)
@@ -353,7 +363,7 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
             vTextWidth += ctx.measureText(s).width
         }
         let vGap = anchor[2] * 0.03
-        let _iw = anchor[2] * 0.028
+        let _iw = Math.min(anchor[2] * 0.028, 15)
         let _y = y + yHeight + anchor[3] * 0.125
         let _x = x + xWidth / 2 - (vTextWidth + vGap * (vTexts.length - 1) + (_iw * 1.25) * vTexts.length) / 2
         for (let i = 0; i < vTexts.length; i++) {
@@ -374,7 +384,7 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
 
 async function drawLineChart(title, chartData, legend, anchor, canvas, ctx) {
     if (title) {
-        ctx.font = `${Math.min(anchor[3] * 0.09, 18.5)}px 等线`
+        ctx.font = `${Math.min(anchor[3] * 0.07, 18.5)}px 等线`
         ctx.fillStyle = 'rgb(89, 89, 89)'
         let textWidth = ctx.measureText(title).width
         ctx.fillText(title, anchor[0] + anchor[2] / 2 - textWidth / 2, anchor[1] + anchor[3] * 0.06)
@@ -389,18 +399,18 @@ async function drawLineChart(title, chartData, legend, anchor, canvas, ctx) {
         minValue = Math.min(minValue, ...series[i].value.data)
         maxValue = Math.max(maxValue, ...series[i].value.data)
     }
-    let xGap = anchor[2] * 0.044 // x开始间距
+    ctx.lineWidth = 0.5
+    ctx.font = `${Math.min(anchor[3] * 0.06, 14)}px 等线`
+    ctx.fillStyle = 'rgb(89, 89, 89)'
+    ctx.strokeStyle = 'rgb(217, 217, 217)'
+    let ticks = calculateTicks(minValue, maxValue, 5, 10)
+    let xGap = ctx.measureText(ticks[ticks.length - 1] + '00').width
     let x = anchor[0] + xGap
     let xWidth = anchor[2] - xGap * 1.5
     let startY = title ? anchor[3] * 0.12 : anchor[3] * 0.05
     let y = anchor[1] + startY
     let yHeight = anchor[3] - startY - anchor[3] * 0.15
-    let ticks = calculateTicks(minValue, maxValue, 5, 10)
     let yGap = yHeight / (ticks.length - 1)
-    ctx.lineWidth = 0.5
-    ctx.font = `${Math.min(anchor[3] * 0.07, 14)}px 等线`
-    ctx.fillStyle = 'rgb(89, 89, 89)'
-    ctx.strokeStyle = 'rgb(217, 217, 217)'
     ctx.beginPath()
     for (let i = 0; i < ticks.length; i++) {
         // y轴数值
@@ -411,7 +421,7 @@ async function drawLineChart(title, chartData, legend, anchor, canvas, ctx) {
             if (vs.indexOf('.') > -1 && vs.split('.')[1].length > 1) {
                 vs = v.toFixed(1)
             }
-            ctx.fillText(vs, x - 6, y + 6)
+            ctx.fillText(vs, x - 4, y + 6)
             ctx.textAlign = 'start'
         }
         if (extInfo.majorGridlines == 'true') {
@@ -477,6 +487,7 @@ async function drawLineChart(title, chartData, legend, anchor, canvas, ctx) {
     }
     if (legend) {
         // 绘制v标签标识
+        x = anchor[0] + xGap
         let vTexts = []
         let vTextWidth = 0
         for (let i = 0; i < series.length; i++) {

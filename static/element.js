@@ -1,3 +1,26 @@
+// 创建空白页
+function createPage(page, width, height) {
+    return {
+    	"page": page || 1,
+    	"extInfo": {
+    		"background": {
+    			"realType": "Background",
+    			"anchor": [0, 0, width || 960, height || 540],
+    			"fillStyle": {
+    				"type": "color",
+    				"color": {
+    					"color": -1,
+    					"realColor": -1
+    				}
+    			}
+    		},
+    		"slideMasterIdx": 0,
+    		"slideLayoutIdx": 0
+    	},
+    	"children": []
+    }
+}
+
 // 创建文本框
 // @param subType 类型 => title1 标题; title2 副标题; content 正文内容
 // @param fontFamily 字体（默认 null）
