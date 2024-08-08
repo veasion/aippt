@@ -52,12 +52,14 @@ Demo: https://veasion.github.io/aippt/ppt2json.html
 
 # 🤝 Business cooperation
 
-Based on the above technology, we have developed a commercializable AIPPT software that supports private deployment!
+We have developed a commercially available aippt software that supports proxy and private deployment for the above technology!
+
+Our advantages include supporting customized industry solutions, supporting complex PPT analysis and rendering such as native charts and animations, supporting user-defined templates, leading technology solutions, and the lowest prices in the industry.
 
 Official website (Open API)：
 https://docmee.cn
 
-Open platform (API/UI Integration)：
+Open platform (API / UI)：
 https://docmee.cn/open-platform
 
 
