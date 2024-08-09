@@ -317,6 +317,9 @@ async function drawPieChart(title, chartData, legend, anchor, canvas, ctx) {
     ctx.rotate(-90 * Math.PI / 180)
     ctx.translate(-x - centerX, -y - centerY)
     let startAngle = 0
+    if (extInfo.startAngle) {
+        startAngle = extInfo.startAngle * (Math.PI / 180)
+    }
     for (let i = 0; i < values.length; i++) {
         let property = dataPoints[i].property
         ctx.fillStyle = await toCtxPaint(ctx, property.fillStyle, property.anchor || anchor)
