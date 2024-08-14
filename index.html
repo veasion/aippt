@@ -222,6 +222,7 @@
     var pptxObj = null
     var selectIdx = 0
     var mTimer = null
+    var gening = false
 
     var markdownRenderer = new marked.Renderer()
     marked.setOptions({
@@ -244,7 +245,6 @@
 	painter.setMode('edit')
 	
     function generateOutline() {
-        outline = ''
         let subject = document.getElementById('subject').value
         if (!subject) {
             alert('请输入主题')
@@ -254,6 +254,11 @@
             alert('主题太短')
             return
         }
+        if (gening) {
+            return
+        }
+        outline = ''
+        gening = true
         const url = 'https://docmee.cn/api/public/ppt/generateOutline?apiKey=' + apiKey
         var source = new SSE(url, {
             method: 'POST',
@@ -267,6 +272,7 @@
         source.onmessage = function (data) {
             let json = JSON.parse(data.data)
             if (json.status == -1) {
+                gening = false
                 alert('生成大纲异常：' + json.error)
                 return
             }
@@ -275,6 +281,7 @@
             window.scrollTo({ behavior: 'smooth', top: document.body.scrollHeight })
         }
         source.onend = function (data) {
+            gening = false
             if (data.data.startsWith('{') && data.data.endsWith('}')) {
                 const json = JSON.parse(data.data)
                 if (json.code != 0) {
@@ -286,6 +293,7 @@
             window.scrollTo(0, 0)
         }
         source.onerror = function (err) {
+            gening = false
             console.error('生成大纲异常', err)
             alert('生成大纲异常')
         }
