@@ -12,20 +12,20 @@
 		::-webkit-scrollbar-thumb {
             background-color: #c1c1c1;
         }
-		.docmee {
-			background-image: linear-gradient(to left, rgb(107, 90, 196), rgb(96, 84, 189));
-			background-clip: text;
-			color: transparent;
-			font-weight: bold;
-			display: inline-block;
-			font-size: 1.125rem;
-			line-height: 1.75rem;
-			user-select: none;
-			cursor: pointer;
-			position: fixed;
-			top: 10px;
-			left: 15px;
-		}
+        .docmee {
+            background-image: linear-gradient(to left, rgb(107, 90, 196), rgb(96, 84, 189));
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+            user-select: none;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            left: 15px;
+        }
         #div1 {
             text-align: center;
             margin-top: 60px;
@@ -230,7 +230,12 @@
 <script src="static/pako.js"></script>
 <script src="static/marked.js"></script>
 <script>
-    const apiKey = '26h1kms70ar4e60iz'
+
+    // 文多多AiPPT
+    // 官网 https://docmee.cn
+    // 开放平台 https://docmee.cn/open-platform
+	
+    const apiKey = '13h8arG50ar4k62ph'
     var pptxId = null
     var outline = ''
     var templateId = ''
@@ -265,8 +270,12 @@
             alert('请输入主题')
             return
         }
-        if (subject.length < 3) {
+        if (subject.length <= 1) {
             alert('主题太短')
+            return
+        }
+        if (subject.length > 30) {
+            alert('主题太长，不能超过30字')
             return
         }
         if (gening) {
