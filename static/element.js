@@ -71,7 +71,6 @@ function createTextBox(subType, fontFamily, fontColor) {
         'id': `${id}`,
         'type': 'text',
         'depth': 1,
-        'xpath': '//shapes[0]/text',
         'point': [...anchor],
         'extInfo': {
             'property': {
@@ -97,7 +96,6 @@ function createTextBox(subType, fontFamily, fontColor) {
                 'pid': `${id}`,
                 'type': 'p',
                 'depth': 2,
-                'xpath': '//shapes[0]/text/p',
                 'extInfo': {
                     'property': {
                         'textAlign': textAlign,
@@ -111,7 +109,6 @@ function createTextBox(subType, fontFamily, fontColor) {
                         'type': 'r',
                         'text': text,
                         'depth': 3,
-                        'xpath': '//shapes[0]/text/p/r',
                         'extInfo': {
                             'property': {
                                 'fontSize': fontSize,
@@ -163,7 +160,6 @@ function createGeometry(geometryName, fillStyle, strokeStylePaint) {
         'id': `${id}`,
     	'type': 'text',
     	'depth': 1,
-    	'xpath': '//shapes[1]/text',
     	'point': [...anchor],
     	'extInfo': {
     		'property': {
@@ -195,7 +191,6 @@ function createGeometry(geometryName, fillStyle, strokeStylePaint) {
     			'pid': `${id}`,
     			'type': 'p',
     			'depth': 2,
-    			'xpath': '//shapes[1]/text/p',
     			'extInfo': {
     				'property': {
     					'textAlign': 'CENTER',
@@ -220,6 +215,7 @@ function createImage(src, width, height) {
     const extension = src.indexOf('.png') > -1 || src.indexOf('image/png') ? '.png' : '.jpg'
     const id = 'img' + Math.floor((Math.random() * 100000) + 100000)
     const anchor = [(960 - width) / 2, (540 - height) / 2, width, height]
+    const contentType = extension == '.png' ? 'image/png' : 'image/jpeg'
     return {
     	'id': id,
     	'depth': 1,
@@ -231,7 +227,17 @@ function createImage(src, width, height) {
     			'anchor': [...anchor],
     			'extension': extension,
     			'fileName': 'image' + extension,
-    			'contentType': extension == '.png' ? 'image/png' : 'image/jpeg',
+    			'contentType': contentType,
+    			'fillStyle': {
+    			    'type': 'texture',
+    			    'texture': {
+    			        'imageData': '$image',
+    			        'flipMode': 'NONE',
+    			        'insets': [0, 0, 0, 0],
+    			        'stretch': [0, 0, 0, 0],
+    			        'contentType': contentType
+    			    }
+    			},
     			'flipHorizontal': false,
     			'flipVertical': false,
     			'realType': 'Picture',
@@ -240,8 +246,7 @@ function createImage(src, width, height) {
     			}
     		}
     	},
-    	'children': [],
-    	'xpath': '//shapes[0]/image'
+    	'children': []
     }
 }
 
@@ -307,7 +312,6 @@ function createTable(rowColumnDataList, rowFillStyles, borderColor, fontColor) {
             	'pid': `${id}_r${i}`,
             	'type': 'tableColumn',
             	'depth': 3,
-            	'xpath': `//shapes[0]/table/row[${i}]/column[${j}]`,
             	'extInfo': {
             		'property': {
             			'realType': 'TableCell',
@@ -360,7 +364,6 @@ function createTable(rowColumnDataList, rowFillStyles, borderColor, fontColor) {
             			'pid': `${id}_r${i}_c${j}`,
             			'type': 'p',
             			'depth': 4,
-            			'xpath': `//shapes[0]/table/row[${i}]/column[${j}]/p`,
             			'extInfo': {
             				'property': {
             					'textAlign': textAlign,
@@ -374,7 +377,6 @@ function createTable(rowColumnDataList, rowFillStyles, borderColor, fontColor) {
             					'type': 'r',
             					'text': text,
             					'depth': 5,
-            					'xpath': `//shapes[0]/table/row[${i}]/column[${j}]/p/r`,
             					'extInfo': {
             						'property': {
             							'fontSize': fontSize,
@@ -393,7 +395,6 @@ function createTable(rowColumnDataList, rowFillStyles, borderColor, fontColor) {
         	'pid': `${id}`,
         	'type': 'tableRow',
         	'depth': 2,
-        	'xpath': `//shapes[0]/table/row[${i}]`,
         	'extInfo': {
         		'property': {
         			'rowHeight': rowHeight
@@ -408,7 +409,6 @@ function createTable(rowColumnDataList, rowFillStyles, borderColor, fontColor) {
     	'type': 'table',
     	'text': null,
     	'depth': 1,
-    	'xpath': '//shapes[0]/table',
     	'point': [...tableAnchor],
     	'extInfo': {
     		'property': {
@@ -507,7 +507,6 @@ function createPieChart(rowColumnDataList, holeSize, colors) {
     	'id': id,
     	'type': 'graphicFrame',
     	'depth': 1,
-    	'xpath': '//shapes[0]/graphicFrame',
     	'point': [...anchor],
     	'extInfo': {
     		'property': {
@@ -602,7 +601,6 @@ function createBarLineChart(title, chartType, rowColumnDataList, colors) {
     	'id': id,
     	'type': 'graphicFrame',
     	'depth': 1,
-    	'xpath': '//shapes[0]/graphicFrame',
     	'point': [...anchor],
     	'extInfo': {
     		'property': {

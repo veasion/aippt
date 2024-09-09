@@ -167,7 +167,7 @@
         <div style="font-size: 14px;color: #999;">生成大纲 ---> 挑选模板 --> 实时生成PPT</div>
     </div>
     <label>主题：</label>
-    <input type="text" id="subject" placeholder="请输入PPT主题" />
+    <input type="text" id="subject" placeholder="请输入PPT主题" maxlength="20" />
     <button onclick="generateOutline()">生成大纲</button>
     <button id="nextTo2" class="next_but" onclick="nextTo2()">下一步：选择模板</button>
     <div id="outline"></div>
@@ -235,7 +235,7 @@
     // 官网 https://docmee.cn
     // 开放平台 https://docmee.cn/open-platform
 	
-    const apiKey = '13h8arG50ar4k62ph'
+    const apiKey = '5hy7sdN5ops9n62zx'
     var pptxId = null
     var outline = ''
     var templateId = ''

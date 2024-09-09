@@ -358,7 +358,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
             let p = obj.children[i]
             let p_property = p.extInfo.property
             let textAlign = p_property.textAlign
-            let lineSpacing = Math.max((p_property.lineSpacing || 100) / 100, 1)
+            let lineSpacing = p_property.lineSpacing > 0 ? (p_property.lineSpacing / 100) : (1 + Math.abs(p_property.lineSpacing || 0) / 100)
             let createPNode = () => {
                 let pNode = textNode.append('tspan').attr('id', p.id)
                 if (textAlign == 'CENTER') {
@@ -479,8 +479,10 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         addElementEvent(g, obj)
         if (property.fillStyle && property.fillStyle.texture) {
             property.fillStyle.texture.imageData = property.image
+            // 图片自带拉伸
+            property.fillStyle.texture.stretch = property.fillStyle.texture.stretch || [0, 0, 0, 0]
         } else {
-            property.fillStyle = { 'type': 'texture', texture: { 'imageData': property.image, insets: property.clipping } }
+            property.fillStyle = { 'type': 'texture', texture: { 'imageData': property.image, insets: property.clipping, stretch: [0, 0, 0, 0] } }
         }
         drawGeometry(property, g, obj.id)
     }
@@ -620,7 +622,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         if (property.chart && property.chart.chartData && property.chart.chartData.length > 0) {
             drawChart(property.chart, [0, 0, anchor[2], anchor[3]]).then(canvas => {
                 let imgSrc = canvas.toDataURL('image/png')
-                let fill = toPaint({ 'type': 'texture', texture: { 'imageData': imgSrc } }, anchor)
+                let fill = toPaint({ 'type': 'texture', texture: { 'imageData': imgSrc, stretch: [0, 0, 0, 0] } }, anchor)
                 g.append('rect')
                         .attr('id', obj.id)
                         .attr('width', anchor[2])
@@ -914,7 +916,8 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
             width = img.width
             height = img.height
         }
-        if (texture.alignment) {
+        if (texture.alignment || !texture.stretch) {
+            // 图片平铺
             width = img.width
             height = img.height
         }

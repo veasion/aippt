@@ -150,7 +150,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		let wInset = textInsets[1] + textInsets[3]
 		for (let i = 0; i < obj.children.length; i++) {
 			let p = obj.children[i]
-			let lineSpacing = Math.max((p.extInfo.property.lineSpacing || 100) / 100, 1)
+			let lineSpacing = p.extInfo.property.lineSpacing > 0 ? (p.extInfo.property.lineSpacing / 100) : (1 + Math.abs(p.extInfo.property.lineSpacing || 0) / 100)
 			let maxFontSize = 0
 			let underlined = false
 			let totalTextWidth = 0
@@ -264,7 +264,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		let textAlign = p.extInfo.property.textAlign
 		let verticalAlignment = textObj.extInfo.property.textVerticalAlignment
 		let textInsets = textObj.extInfo.property.textInsets || [0, 0, 0, 0]
-		let lineSpacing = Math.max((p.extInfo.property.lineSpacing || 100) / 100, 1)
+		let lineSpacing = p.extInfo.property.lineSpacing > 0 ? (p.extInfo.property.lineSpacing / 100) : (1 + Math.abs(p.extInfo.property.lineSpacing || 0) / 100)
 		let x = anchor[0]
 		let y = anchor[1] + (marginTop || 0)
 		let endX = anchor[0] + anchor[2] - textInsets[3]
@@ -459,8 +459,10 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		shapeHandle(property)
 		if (property.fillStyle && property.fillStyle.texture) {
 			property.fillStyle.texture.imageData = property.image
+		    // 图片自带拉伸
+		    property.fillStyle.texture.stretch = property.fillStyle.texture.stretch || [0, 0, 0, 0]
 		} else {
-			property.fillStyle = { 'type': 'texture', texture: { 'imageData': property.image, insets: property.clipping } }
+			property.fillStyle = { 'type': 'texture', texture: { 'imageData': property.image, insets: property.clipping, stretch: [0, 0, 0, 0] } }
 		}
 		if (!property.geometry) {
 			property.geometry = { name: 'rect' }
@@ -946,7 +948,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 			} else if (paint.type == 'pattern') {
 				// 图案
 				let pattern = paint.pattern
-				let prst = pattern.prst
+				// let prst = pattern.prst
 				let fgColor = pattern.fgColor.realColor
 				let bgColor = pattern.bgColor.realColor
 				let width = anchor[2], height = anchor[3]
@@ -990,11 +992,11 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 	function createTexturePattern(img, texture, anchor, isBackground) {
 		let width = anchor[2]
 		let height = anchor[3]
-		let mode = texture.alignment ? 'repeat' : 'no-repeat'
+		let mode = texture.alignment || !texture.stretch ? 'repeat' : 'no-repeat'
 		if (width < 1 && height < 1 || isNaN(width) || isNaN(height)) {
 			return ctx.createPattern(img, mode)
 		}
-		if (texture.alignment) {
+		if (texture.alignment || !texture.stretch) {
 			width = img.width
 			height = img.height
 		}

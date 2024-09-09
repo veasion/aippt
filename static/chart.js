@@ -693,11 +693,11 @@ function toCtxPaint(ctx, paint, anchor, isBackground, defaultColor) {
 function createCtxTexturePattern(ctx, img, texture, anchor) {
     let width = anchor[2]
     let height = anchor[3]
-    let mode = texture.alignment ? 'repeat' : 'no-repeat'
+    let mode = texture.alignment || !texture.stretch ? 'repeat' : 'no-repeat'
     if (width < 1 && height < 1 || isNaN(width) || isNaN(height)) {
         return ctx.createPattern(img, mode)
     }
-    if (texture.alignment) {
+    if (texture.alignment || !texture.stretch) {
         width = img.width
         height = img.height
     }
