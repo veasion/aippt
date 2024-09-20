@@ -1,23 +1,23 @@
 // 创建空白页
 function createPage(page, width, height) {
     return {
-    	"page": page || 1,
-    	"extInfo": {
-    		"background": {
-    			"realType": "Background",
-    			"anchor": [0, 0, width || 960, height || 540],
-    			"fillStyle": {
-    				"type": "color",
-    				"color": {
-    					"color": -1,
-    					"realColor": -1
+    	page: page || 1,
+    	extInfo: {
+    		background: {
+    			realType: 'Background',
+    			anchor: [0, 0, width || 960, height || 540],
+    			fillStyle: {
+    				type: 'color',
+    				color: {
+    					color: -1,
+    					realColor: -1
     				}
     			}
     		},
-    		"slideMasterIdx": 0,
-    		"slideLayoutIdx": 0
+    		slideMasterIdx: 0,
+    		slideLayoutIdx: 0
     	},
-    	"children": []
+    	children: []
     }
 }
 
@@ -41,82 +41,82 @@ function createTextBox(subType, fontFamily, fontColor) {
     if (!fontColor && subType == 'title1') {
         // 标题默认颜色
         fontColor = {
-          'type': 'gradient',
-          'gradient': {
-              'angle': 90,
-              'colors': [
-                {'color': -7614, 'realColor': -7614, 'alpha': 100000},
-                {'color': -1838, 'realColor': -1838, 'alpha': 100000},
-                {'color': -7614, 'realColor': -7614, 'alpha': 100000},
-                {'color': -25569, 'realColor': -25569, 'alpha': 100000},
-                {'color': -7614, 'realColor': -7614, 'alpha': 100000}
+          type: 'gradient',
+          gradient: {
+              angle: 90,
+              colors: [
+                {color: -7614, realColor: -7614, alpha: 100000},
+                {color: -1838, realColor: -1838, alpha: 100000},
+                {color: -7614, realColor: -7614, alpha: 100000},
+                {color: -25569, realColor: -25569, alpha: 100000},
+                {color: -7614, realColor: -7614, alpha: 100000}
               ],
-              'fractions': [0.06, 0.26, 0.5, 0.71, 0.89],
-              'gradientType': 'linear'
+              fractions: [0.06, 0.26, 0.5, 0.71, 0.89],
+              gradientType: 'linear'
           }
         }
     } else if (!fontColor) {
         // 正文默认颜色
         fontColor = {
-          'type': 'color',
-          'color': {
-              'scheme': null,
-              'realColor': -16777216,
-              'color': -16777216
+          type: 'color',
+          color: {
+              scheme: null,
+              realColor: -16777216,
+              color: -16777216
           },
-          'gradient': null
+          gradient: null
         }
     }
     return {
-        'id': `${id}`,
-        'type': 'text',
-        'depth': 1,
-        'point': [...anchor],
-        'extInfo': {
-            'property': {
-                'realType': 'TextBox',
-                'shapeType': 'rect',
-                'anchor': [...anchor],
-                'fillStyle': {
-                    'type': 'noFill'
+        id: `${id}`,
+        type: 'text',
+        depth: 1,
+        point: [...anchor],
+        extInfo: {
+            property: {
+                realType: 'TextBox',
+                shapeType: 'rect',
+                anchor: [...anchor],
+                fillStyle: {
+                    type: 'noFill'
                 },
-                'geometry': {
-                    'name': 'rect'
+                geometry: {
+                    name: 'rect'
                 },
-                'textAutofit': 'SHAPE',
-                'textDirection': 'HORIZONTAL',
-                'textVerticalAlignment': 'TOP',
-                'textWordWrap': textWordWrap,
-                'textInsets': [3.6,7.2,3.6,7.2]
+                textAutofit: 'SHAPE',
+                textDirection: 'HORIZONTAL',
+                textVerticalAlignment: 'TOP',
+                textWordWrap: textWordWrap,
+                textInsets: [3.6,7.2,3.6,7.2]
             }
         },
-        'children': [
+        children: [
             {
-                'id': `${id}_p`,
-                'pid': `${id}`,
-                'type': 'p',
-                'depth': 2,
-                'extInfo': {
-                    'property': {
-                        'textAlign': textAlign,
-                        'leftMargin': 0
+                id: `${id}_p`,
+                pid: `${id}`,
+                type: 'p',
+                depth: 2,
+                extInfo: {
+                    property: {
+                        textAlign: textAlign,
+                        leftMargin: 0
                     }
                 },
-                'children': [
+                children: [
                     {
-                        'id': `${id}_p_r`,
-                        'pid': `${id}_p`,
-                        'type': 'r',
-                        'text': text,
-                        'depth': 3,
-                        'extInfo': {
-                            'property': {
-                                'fontSize': fontSize,
-                                'bold': null,
-                                'fontFamily': fontFamily,
-                                'fontColor': {...fontColor},
-                                'line': null,
-                                'lang': 'zh-CN'
+                        id: `${id}_p_r`,
+                        pid: `${id}_p`,
+                        type: 'r',
+                        text: text,
+                        depth: 3,
+                        extInfo: {
+                            property: {
+                                fontSize: fontSize,
+                                bold: null,
+                                fontFamily: fontFamily,
+                                fontColor: {...fontColor},
+                                line: null,
+                                lang: 'zh-CN'
                             }
                         }
                     }
@@ -137,67 +137,67 @@ function createGeometry(geometryName, fillStyle, strokeStylePaint) {
     const id = 'txt' + Math.floor((Math.random() * 100000) + 100000)
     if (!fillStyle) {
         fillStyle = {
-            'type': 'color',
-            'color': {
-                'scheme': null,
-                'color': -10773547,
-                'realColor': -10773547
+            type: 'color',
+            color: {
+                scheme: null,
+                color: -10773547,
+                realColor: -10773547
             }
         }
     }
     if (!strokeStylePaint) {
         strokeStylePaint = {
-            'type': 'color',
-            'color': {
-                'scheme': null,
-                'color': -10773547,
-                'realColor': -14532775,
-                'shade': 15000
+            type: 'color',
+            color: {
+                scheme: null,
+                color: -10773547,
+                realColor: -14532775,
+                shade: 15000
             }
         }
     }
     return {
-        'id': `${id}`,
-    	'type': 'text',
-    	'depth': 1,
-    	'point': [...anchor],
-    	'extInfo': {
-    		'property': {
-    			'realType': 'Auto',
-    			'shapeType': geometryName,
-    			'anchor': [...anchor],
-    			'fillStyle': {...fillStyle},
-    			'strokeStyle': {
-    				'paint': {...strokeStylePaint},
-    				'lineWidth': 1,
-    				'lineCap': 'FLAT',
-    				'lineDash': 'SOLID',
-    				'lineCompound': 'SINGLE'
+        id: `${id}`,
+    	type: 'text',
+    	depth: 1,
+    	point: [...anchor],
+    	extInfo: {
+    		property: {
+    			realType: 'Auto',
+    			shapeType: geometryName,
+    			anchor: [...anchor],
+    			fillStyle: {...fillStyle},
+    			strokeStyle: {
+    				paint: {...strokeStylePaint},
+    				lineWidth: 1,
+    				lineCap: 'FLAT',
+    				lineDash: 'SOLID',
+    				lineCompound: 'SINGLE'
     			},
-    			'geometry': {
-    				'name': geometryName,
-    				'data': null,
-    				'avLst': null
+    			geometry: {
+    				name: geometryName,
+    				data: null,
+    				avLst: null
     			},
-    			'textAutofit': 'NORMAL',
-    			'textDirection': 'HORIZONTAL',
-    			'textVerticalAlignment': 'MIDDLE',
-    			'textInsets': [3.6, 7.2, 3.6, 7.2]
+    			textAutofit: 'NORMAL',
+    			textDirection: 'HORIZONTAL',
+    			textVerticalAlignment: 'MIDDLE',
+    			textInsets: [3.6, 7.2, 3.6, 7.2]
     		}
     	},
-    	'children': [
+    	children: [
     		{
-    			'id': `${id}_p`,
-    			'pid': `${id}`,
-    			'type': 'p',
-    			'depth': 2,
-    			'extInfo': {
-    				'property': {
-    					'textAlign': 'CENTER',
-    					'leftMargin': 0
+    			id: `${id}_p`,
+    			pid: `${id}`,
+    			type: 'p',
+    			depth: 2,
+    			extInfo: {
+    				property: {
+    					textAlign: 'CENTER',
+    					leftMargin: 0
     				}
     			},
-                'children': []
+                children: []
     		}
     	]
     }
@@ -217,36 +217,36 @@ function createImage(src, width, height) {
     const anchor = [(960 - width) / 2, (540 - height) / 2, width, height]
     const contentType = extension == '.png' ? 'image/png' : 'image/jpeg'
     return {
-    	'id': id,
-    	'depth': 1,
-    	'type': 'image',
-    	'point': [...anchor],
-    	'extInfo': {
-    		'property': {
-                'image': src,
-    			'anchor': [...anchor],
-    			'extension': extension,
-    			'fileName': 'image' + extension,
-    			'contentType': contentType,
-    			'fillStyle': {
-    			    'type': 'texture',
-    			    'texture': {
-    			        'imageData': '$image',
-    			        'flipMode': 'NONE',
-    			        'insets': [0, 0, 0, 0],
-    			        'stretch': [0, 0, 0, 0],
-    			        'contentType': contentType
+    	id: id,
+    	depth: 1,
+    	type: 'image',
+    	point: [...anchor],
+    	extInfo: {
+    		property: {
+                image: src,
+    			anchor: [...anchor],
+    			extension: extension,
+    			fileName: 'image' + extension,
+    			contentType: contentType,
+    			fillStyle: {
+    			    type: 'texture',
+    			    texture: {
+    			        imageData: '$image',
+    			        flipMode: 'NONE',
+    			        insets: [0, 0, 0, 0],
+    			        stretch: [0, 0, 0, 0],
+    			        contentType: contentType
     			    }
     			},
-    			'flipHorizontal': false,
-    			'flipVertical': false,
-    			'realType': 'Picture',
-    			'geometry': {
-    				'name': 'rect'
+    			flipHorizontal: false,
+    			flipVertical: false,
+    			realType: 'Picture',
+    			geometry: {
+    				name: 'rect'
     			}
     		}
     	},
-    	'children': []
+    	children: []
     }
 }
 
@@ -270,32 +270,32 @@ function createTable(rowColumnDataList, rowFillStyles, borderColor, fontColor) {
     if (!rowFillStyles) {
         rowFillStyles = [
             {
-                'type': 'color',
-                'color': {
-                    'color': -7555288,
-                    'realColor': -1378864,
-                    'lumMod': 20000,
-                    'lumOff': 80000
+                type: 'color',
+                color: {
+                    color: -7555288,
+                    realColor: -1378864,
+                    lumMod: 20000,
+                    lumOff: 80000
                 }
             },
             {
-            	'type': 'color',
-            	'color': {
-            		'color': -7555288,
-            		'realColor': -2823519,
-            		'lumMod': 40000,
-            		'lumOff': 60000
+            	type: 'color',
+            	color: {
+            		color: -7555288,
+            		realColor: -2823519,
+            		lumMod: 40000,
+            		lumOff: 60000
             	}
             }
         ]
     }
     if (!fontColor) {
         fontColor = {
-            'type': 'color',
-            'color': {
-                'color': -16777216,
-                'realColor': -16777216,
-                'alpha': 100000
+            type: 'color',
+            color: {
+                color: -16777216,
+                realColor: -16777216,
+                alpha: 100000
             }
         }
     }
@@ -308,80 +308,80 @@ function createTable(rowColumnDataList, rowFillStyles, borderColor, fontColor) {
         for (let j = 0; j < columnNum; j++) {
             let text = rowColumnDataList[i][j]
             columns.push({
-            	'id': `${id}_r${i}_c${j}`,
-            	'pid': `${id}_r${i}`,
-            	'type': 'tableColumn',
-            	'depth': 3,
-            	'extInfo': {
-            		'property': {
-            			'realType': 'TableCell',
-            			'anchor': [tableAnchor[0] + colWidth * j + lineWidth * (j + 1), tableAnchor[1] + rowHeight * i + lineWidth * (i + 1), colWidth, rowHeight],
-            			'fillStyle': {...fillStyle},
-            			'strokeStyle': {},
-            			'geometry': {
-            				'name': 'tableColumn'
+            	id: `${id}_r${i}_c${j}`,
+            	pid: `${id}_r${i}`,
+            	type: 'tableColumn',
+            	depth: 3,
+            	extInfo: {
+            		property: {
+            			realType: 'TableCell',
+            			anchor: [tableAnchor[0] + colWidth * j + lineWidth * (j + 1), tableAnchor[1] + rowHeight * i + lineWidth * (i + 1), colWidth, rowHeight],
+            			fillStyle: {...fillStyle},
+            			strokeStyle: {},
+            			geometry: {
+            				name: 'tableColumn'
             			},
-            			'textAutofit': 'NORMAL',
-            			'textDirection': 'HORIZONTAL',
-            			'textVerticalAlignment': 'MIDDLE',
-            			'textInsets': [3.6, 7.2, 3.6, 7.2],
-            			'columnWidth': colWidth,
-            			'borders': [
+            			textAutofit: 'NORMAL',
+            			textDirection: 'HORIZONTAL',
+            			textVerticalAlignment: 'MIDDLE',
+            			textInsets: [3.6, 7.2, 3.6, 7.2],
+            			columnWidth: colWidth,
+            			borders: [
             				{
-            					'color': borderColor,
-            					'lineWidth': lineWidth,
-            					'lineCap': 'FLAT',
-            					'lineDash': 'SOLID',
-            					'lineCompound': 'SINGLE'
+            					color: borderColor,
+            					lineWidth: lineWidth,
+            					lineCap: 'FLAT',
+            					lineDash: 'SOLID',
+            					lineCompound: 'SINGLE'
             				},
             				{
-            					'color': borderColor,
-            					'lineWidth': lineWidth,
-            					'lineCap': 'FLAT',
-            					'lineDash': 'SOLID',
-            					'lineCompound': 'SINGLE'
+            					color: borderColor,
+            					lineWidth: lineWidth,
+            					lineCap: 'FLAT',
+            					lineDash: 'SOLID',
+            					lineCompound: 'SINGLE'
             				},
             				{
-            					'color': borderColor,
-            					'lineWidth': lineWidth,
-            					'lineCap': 'FLAT',
-            					'lineDash': 'SOLID',
-            					'lineCompound': 'SINGLE'
+            					color: borderColor,
+            					lineWidth: lineWidth,
+            					lineCap: 'FLAT',
+            					lineDash: 'SOLID',
+            					lineCompound: 'SINGLE'
             				},
             				{
-            					'color': borderColor,
-            					'lineWidth': lineWidth,
-            					'lineCap': 'FLAT',
-            					'lineDash': 'SOLID',
-            					'lineCompound': 'SINGLE'
+            					color: borderColor,
+            					lineWidth: lineWidth,
+            					lineCap: 'FLAT',
+            					lineDash: 'SOLID',
+            					lineCompound: 'SINGLE'
             				}
             			]
             		}
             	},
-            	'children': [
+            	children: [
             		{
-            			'id': `${id}_r${i}_c${j}_p`,
-            			'pid': `${id}_r${i}_c${j}`,
-            			'type': 'p',
-            			'depth': 4,
-            			'extInfo': {
-            				'property': {
-            					'textAlign': textAlign,
-            					'leftMargin': 0
+            			id: `${id}_r${i}_c${j}_p`,
+            			pid: `${id}_r${i}_c${j}`,
+            			type: 'p',
+            			depth: 4,
+            			extInfo: {
+            				property: {
+            					textAlign: textAlign,
+            					leftMargin: 0
             				}
             			},
-            			'children': [
+            			children: [
             				{
-            					'id': `${id}_r${i}_c${j}_p_r`,
-            					'pid': `${id}_r${i}_c${j}_p`,
-            					'type': 'r',
-            					'text': text,
-            					'depth': 5,
-            					'extInfo': {
-            						'property': {
-            							'fontSize': fontSize,
-            							'fontColor': {...fontColor},
-            							'lang': 'zh-CN'
+            					id: `${id}_r${i}_c${j}_p_r`,
+            					pid: `${id}_r${i}_c${j}_p`,
+            					type: 'r',
+            					text: text,
+            					depth: 5,
+            					extInfo: {
+            						property: {
+            							fontSize: fontSize,
+            							fontColor: {...fontColor},
+            							lang: 'zh-CN'
             						}
             					}
             				}
@@ -391,34 +391,34 @@ function createTable(rowColumnDataList, rowFillStyles, borderColor, fontColor) {
             })
         }
         rows.push({
-        	'id': `${id}_r${i}`,
-        	'pid': `${id}`,
-        	'type': 'tableRow',
-        	'depth': 2,
-        	'extInfo': {
-        		'property': {
-        			'rowHeight': rowHeight
+        	id: `${id}_r${i}`,
+        	pid: `${id}`,
+        	type: 'tableRow',
+        	depth: 2,
+        	extInfo: {
+        		property: {
+        			rowHeight: rowHeight
         		}
         	},
-        	'children': columns
+        	children: columns
         })
     }
     return {
-    	'id': `${id}`,
-    	'pid': null,
-    	'type': 'table',
-    	'text': null,
-    	'depth': 1,
-    	'point': [...tableAnchor],
-    	'extInfo': {
-    		'property': {
-    			'anchor': [...tableAnchor],
-    			'realType': 'table',
-                'numberOfRows': rowNum,
-    			'numberOfColumns': columnNum
+    	id: `${id}`,
+    	pid: null,
+    	type: 'table',
+    	text: null,
+    	depth: 1,
+    	point: [...tableAnchor],
+    	extInfo: {
+    		property: {
+    			anchor: [...tableAnchor],
+    			realType: 'table',
+                numberOfRows: rowNum,
+    			numberOfColumns: columnNum
     		}
     	},
-    	'children': rows
+    	children: rows
     }
 }
 
@@ -432,12 +432,12 @@ function createTable(rowColumnDataList, rowFillStyles, borderColor, fontColor) {
 function createChart(title, chartType, rowColumnDataList, colors) {
     if (!colors) {
         colors = [
-            {'type': 'color', 'color': { 'color': -478429, 'realColor': -478429 }},
-            {'type': 'color', 'color': { 'color': -10130855, 'realColor': -10130855 }},
-            {'type': 'color', 'color': { 'color': -12143947, 'realColor': -12143947 }},
-            {'type': 'color', 'color': { 'color': -7558530, 'realColor': -7558530 }},
-            {'type': 'color', 'color': { 'color': -2920600, 'realColor': -2920600 }},
-            {'type': 'color', 'color': { 'color': -8232330, 'realColor': -8232330 }}
+            {type: 'color', color: { color: -478429, realColor: -478429 }},
+            {type: 'color', color: { color: -10130855, realColor: -10130855 }},
+            {type: 'color', color: { color: -12143947, realColor: -12143947 }},
+            {type: 'color', color: { color: -7558530, realColor: -7558530 }},
+            {type: 'color', color: { color: -2920600, realColor: -2920600 }},
+            {type: 'color', color: { color: -8232330, realColor: -8232330 }}
         ]
     }
     if (chartType == 'pie' || chartType == 'doughnut') {
@@ -457,90 +457,90 @@ function createPieChart(rowColumnDataList, holeSize, colors) {
     const dataPoint = []
     for (let i = 1; i < rowColumnDataList.length; i++) {
         dataPoint.push({
-            'property': {
-                'anchor': null,
-                'fillStyle': colors[(i - 1) % colors.length],
-                'strokeStyle': {
-                    'paint': {
-                        'type': 'color',
-                        'color': {
-                            'scheme': 'lt1',
-                            'realColor': -1,
-                            'color': -1
+            property: {
+                anchor: null,
+                fillStyle: colors[(i - 1) % colors.length],
+                strokeStyle: {
+                    paint: {
+                        type: 'color',
+                        color: {
+                            scheme: 'lt1',
+                            realColor: -1,
+                            color: -1
                         }
                     },
-                    'lineWidth': 1.5
+                    lineWidth: 1.5
                 },
-                'geometry': null,
-                'shadow': null
+                geometry: null,
+                shadow: null
             }
         })
     }
     const chartData = {
-    	'chartType': holeSize ? 'doughnut' : 'pie',
-    	'series': [
+    	chartType: holeSize ? 'doughnut' : 'pie',
+    	series: [
     		{
-    			'text': {
-    				'formula': 'Sheet1!$B$1',
-    				'formatCode': null,
-    				'data': [rowColumnDataList[0][1]]
+    			text: {
+    				formula: 'Sheet1!$B$1',
+    				formatCode: null,
+    				data: [rowColumnDataList[0][1]]
     			},
-    			'category': {
-    				'formula': 'Sheet1!$A$2:$A$' + rowColumnDataList.length,
-    				'formatCode': null,
-    				'data': rowColumnDataList.map(s => s[0]).splice(1)
+    			category: {
+    				formula: 'Sheet1!$A$2:$A$' + rowColumnDataList.length,
+    				formatCode: null,
+    				data: rowColumnDataList.map(s => s[0]).splice(1)
     			},
-    			'value': {
-    				'formula': 'Sheet1!$B$2:$B$' + rowColumnDataList.length,
-    				'formatCode': 'General',
-    				'data': rowColumnDataList.map(s => s[1]).splice(1)
+    			value: {
+    				formula: 'Sheet1!$B$2:$B$' + rowColumnDataList.length,
+    				formatCode: 'General',
+    				data: rowColumnDataList.map(s => s[1]).splice(1)
     			},
-    			'dataPoint': dataPoint,
-    			'property': null
+    			dataPoint: dataPoint,
+    			property: null
     		}
     	],
-    	'categoryAxis': null,
-    	'valueAxes': null,
-    	'extInfo': holeSize ? { 'holeSize': holeSize } : {}
+    	categoryAxis: null,
+    	valueAxes: null,
+    	extInfo: holeSize ? { holeSize: holeSize } : {}
     }
     return {
-    	'id': id,
-    	'type': 'graphicFrame',
-    	'depth': 1,
-    	'point': [...anchor],
-    	'extInfo': {
-    		'property': {
-    			'anchor': [...anchor],
-    			'chart': {
-    				'title': '',
-    				'legend': {
-    					'position': 'BOTTOM',
-    					'property': {
-    						'anchor': null,
-    						'fillStyle': {
-    							'type': 'noFill'
+    	id: id,
+    	type: 'graphicFrame',
+    	depth: 1,
+    	point: [...anchor],
+    	extInfo: {
+    		property: {
+    			anchor: [...anchor],
+    			chart: {
+    				title: '',
+    				legend: {
+    					position: 'BOTTOM',
+    					property: {
+    						anchor: null,
+    						fillStyle: {
+    							type: 'noFill'
     						},
-    						'strokeStyle': {
-    							'paint': {
-    								'type': 'noFill'
+    						strokeStyle: {
+    							paint: {
+    								type: 'noFill'
     							}
     						},
-    						'geometry': null,
-    						'shadow': null
+    						geometry: null,
+    						shadow: null
     					}
     				},
-    				'excelData': [
+    				excelData: [
     					{
-    						'sheetName': 'Sheet1',
-    						'rows': rowColumnDataList
+    						sheetName: 'Sheet1',
+    						rows: rowColumnDataList
     					}
     				],
-    				'chartData': [chartData]
+    				chartData: [chartData]
     			},
-    			'realType': 'graphicFrame'
+    			realType: 'graphicFrame'
     		}
     	},
-    	'children': []
+    	children: []
     }
 }
 
@@ -553,138 +553,140 @@ function createBarLineChart(title, chartType, rowColumnDataList, colors) {
     for (let i = 1; i < rowColumnDataList[0].length; i++) {
         const vf = String.fromCharCode(65 + i)
         series.push({
-            'text': {
-                'formula': 'Sheet1!$' + vf + '$1',
-                'formatCode': null,
-                'data': [rowColumnDataList[0][i]]
+            text: {
+                formula: 'Sheet1!$' + vf + '$1',
+                formatCode: null,
+                data: [rowColumnDataList[0][i]]
             },
-            'category': {
-                'formula': 'Sheet1!$A$' + (i + 1) + ':$A$' + rowColumnDataList.length,
-                'formatCode': null,
-                'data': rowColumnDataList.map(s => s[0]).splice(1)
+            category: {
+                formula: 'Sheet1!$A$' + (i + 1) + ':$A$' + rowColumnDataList.length,
+                formatCode: null,
+                data: rowColumnDataList.map(s => s[0]).splice(1)
             },
-            'value': {
-                'formula': 'Sheet1!$' + vf + '$' + (i + 1) + ':$' + vf + '$' + rowColumnDataList.length,
-                'formatCode': 'General',
-                'data': rowColumnDataList.map(s => s[i]).splice(1)
+            value: {
+                formula: 'Sheet1!$' + vf + '$' + (i + 1) + ':$' + vf + '$' + rowColumnDataList.length,
+                formatCode: 'General',
+                data: rowColumnDataList.map(s => s[i]).splice(1)
             },
-            'dataPoint': [null],
-            'property': {
-                'anchor': null,
-                'fillStyle': chartType == 'line' ? null : colors[(i - 1) % colors.length],
-                'strokeStyle': chartType == 'line' ? {
-                    'paint': colors[(i - 1) % colors.length],
-                    'lineWidth': 2.25,
-                    'lineCap': 'ROUND'
+            dataPoint: [null],
+            property: {
+                anchor: null,
+                fillStyle: chartType == 'line' ? null : colors[(i - 1) % colors.length],
+                strokeStyle: chartType == 'line' ? {
+                    paint: colors[(i - 1) % colors.length],
+                    lineWidth: 2.25,
+                    lineCap: 'ROUND'
                 } : {
-                    'paint': {
-                        'type': 'noFill'
+                    paint: {
+                        type: 'noFill'
                     }
                 },
-                'geometry': null,
-                'shadow': null
+                geometry: null,
+                shadow: null
             }
         })
     }
     let extInfo = {}
     if (chartType == 'bar') {
         extInfo = {
-            'type': 'col',
-            'overlap': '-27',
-            'gapWidth': '219',
-            'majorGridlines': 'true'
+            type: 'col',
+            overlap: '-27',
+            gapWidth: '219',
+            majorGridlines: 'true'
         }
     } else if (chartType == 'line') {
-        extInfo = { 'majorGridlines': 'true' }
+        extInfo = { majorGridlines: 'true' }
     }
     return {
-    	'id': id,
-    	'type': 'graphicFrame',
-    	'depth': 1,
-    	'point': [...anchor],
-    	'extInfo': {
-    		'property': {
-    			'anchor': [...anchor],
-    			'chart': {
-    				'title': title,
-    				'legend': {
-    					'position': 'BOTTOM',
-    					'property': {
-    						'anchor': null,
-    						'fillStyle': {
-    							'type': 'noFill'
+    	id: id,
+    	type: 'graphicFrame',
+    	depth: 1,
+    	point: [...anchor],
+    	extInfo: {
+    		property: {
+    			anchor: [...anchor],
+    			chart: {
+    				title: title,
+    				legend: {
+    					position: 'BOTTOM',
+    					property: {
+    						anchor: null,
+    						fillStyle: {
+    							type: 'noFill'
     						},
-    						'strokeStyle': {
-    							'paint': {
-    								'type': 'noFill'
+    						strokeStyle: {
+    							paint: {
+    								type: 'noFill'
     							}
     						},
-    						'geometry': null,
-    						'shadow': null
+    						geometry: null,
+    						shadow: null
     					}
     				},
-    				'excelData': [
+    				excelData: [
     					{
-    						'sheetName': 'Sheet1',
-    						'rows': rowColumnDataList
+    						sheetName: 'Sheet1',
+    						rows: rowColumnDataList
     					}
     				],
-    				'chartData': [
+    				chartData: [
     					{
-    						'chartType': chartType,
-    						'series': series,
-    						'categoryAxis': {
-    							'position': 'BOTTOM',
-    							'deleted': false,
-    							'property': {
-    								'anchor': null,
-    								'fillStyle': {
-    									'type': 'noFill'
+    						chartType: chartType,
+    						series: series,
+    						categoryAxis: {
+    							position: 'BOTTOM',
+    							deleted: false,
+    							property: {
+    								anchor: null,
+    								fillStyle: {
+    									type: 'noFill'
     								},
-    								'strokeStyle': {
-    									'paint': {
-    										'type': 'color',
-    										'color': {
-    											'realColor': -2500135,
-    											'color': -16777216,
-    											'lumMod': 15000,
-    											'lumOff': 85000
+    								strokeStyle: {
+    									paint: {
+    										type: 'color',
+    										color: {
+    											realColor: -2500135,
+    											color: -16777216,
+    											lumMod: 15000,
+    											lumOff: 85000
     										}
     									},
-    									'lineWidth': 0.75,
-    									'lineCap': 'FLAT',
-    									'lineCompound': 'SINGLE'
+    									lineWidth: 0.75,
+    									lineCap: 'FLAT',
+    									lineCompound: 'SINGLE'
     								},
-    								'geometry': null,
-    								'shadow': null
+    								geometry: null,
+    								shadow: null
     							}
     						},
-    						'valueAxes': [
+    						valueAxes: [
     							{
-    								'position': 'LEFT',
-    								'deleted': false,
-    								'property': {
-    									'anchor': null,
-    									'fillStyle': {
-    										'type': 'noFill'
+    								position: 'LEFT',
+    								deleted: false,
+    								property: {
+    									anchor: null,
+    									fillStyle: {
+    										type: 'noFill'
     									},
-    									'strokeStyle': {
-    										'paint': {
-    											'type': 'noFill'
+    									strokeStyle: {
+    										paint: {
+    											type: 'noFill'
     										}
     									},
-    									'geometry': null,
-    									'shadow': null
+    									geometry: null,
+    									shadow: null
     								}
     							}
     						],
-    						'extInfo': extInfo
+    						extInfo: extInfo
     					}
     				]
     			},
-    			'realType': 'graphicFrame'
+    			realType: 'graphicFrame'
     		}
     	},
-    	'children': []
+    	children: []
     }
 }
+
+// export { createPage, createTextBox, createGeometry, createImage, createTable, createChart }
