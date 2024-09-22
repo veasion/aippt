@@ -164,7 +164,7 @@
 <div id="div1">
     <div style="margin-bottom: 50px;">
         <h1>🤖 AI智能生成PPT演示文稿</h1>
-        <div style="font-size: 14px;color: #999;">生成大纲 ---> 挑选模板 --> 实时生成PPT</div>
+        <div style="font-size: 14px;color: #999;">生成大纲 ---&gt; 挑选模板 ---&gt; 实时生成PPT</div>
     </div>
     <label>主题：</label>
     <input type="text" id="subject" placeholder="请输入PPT主题" maxlength="20" />
@@ -520,7 +520,7 @@
         download.innerText = '正在渲染中...'
         let xhr = new XMLHttpRequest()
         xhr.responseType = 'blob'
-        xhr.open('POST', 'https://docmee.cn/api/public/ppt/json2ppt?apiKey=' + apiKey)
+        xhr.open('POST', 'https://docmee.cn/api/public/ppt/json2ppt?animationType=1&apiKey=' + apiKey)
         xhr.setRequestHeader('Content-Type', 'application/json')
         xhr.onload = function() {
             if (this.status == 200) {
