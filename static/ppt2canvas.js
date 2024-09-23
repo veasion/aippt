@@ -105,12 +105,34 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		let property = obj.extInfo.property
 		let geometryName = (property.geometry || {}).name || 'rect'
 		ctx.save()
-		shapeHandle(property, true)
+		shapeHandle(property)
 		let marginTop = property.strokeStyle ? (property.strokeStyle.lineWidth || 1) : 0
 		if (geometryName == 'tableColumn') {
 			await drawTableColumn(property)
 		} else {
 			await drawGeometry(property)
+		}
+		let anchor = property.anchor
+		let cx = anchor[0] + anchor[2] / 2
+		let cy = anchor[1] + anchor[3] / 2
+		let x = ctx.groupFlipX || 1
+		let y = ctx.groupFlipY || 1
+		if (property.flipHorizontal) {
+			x *= -1
+		}
+		if (property.flipVertical) {
+			y *= -1
+		}
+		if (y == -1) {
+			if (x == 1) {
+				ctx.translate(cx, cy)
+				ctx.scale(-1, 1)
+				ctx.translate(-cx, -cy)
+			}
+		} else if (x == -1) {
+			ctx.translate(cx, cy)
+			ctx.scale(-1, 1)
+			ctx.translate(-cx, -cy)
 		}
 		if (templateHandle) {
 			await templateHandle('text', obj, ctx)
@@ -727,7 +749,7 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 		}
 	}
 
-	function shapeHandle(property, isText) {
+	function shapeHandle(property) {
 		let anchor = property.anchor
 		if (!anchor) {
 			return
@@ -743,43 +765,21 @@ function Ppt2Canvas(_canvas, imageCrossOrigin) {
 				ctx.groupRotation = (ctx.groupRotation || 0) + property.rotation
 			}
 		}
-		if (isText) {
-			let x = ctx.groupFlipX || 1
-			let y = ctx.groupFlipY || 1
-			if (property.flipVertical) {
-				y *= -1
-				ctx.translate(cx, cy)
-				ctx.scale(1, -1)
-				ctx.translate(-cx, -cy)
-			}
-			if (y == -1) {
-				if (x == 1) {
-					ctx.translate(cx, cy)
-					ctx.scale(-1, 1)
-					ctx.translate(-cx, -cy)
-				}
-			} else if (x == -1) {
-				ctx.translate(cx, cy)
-				ctx.scale(-1, 1)
-				ctx.translate(-cx, -cy)
-			}
-		} else {
-			if (property.flipVertical) {
-				ctx.translate(cx, cy)
-				ctx.scale(1, -1)
-				ctx.translate(-cx, -cy)
-				if (property.realType == 'Group') {
-					ctx.groupFlipY = -(ctx.groupFlipY || 1)
-				}
-			}
-			if (property.flipHorizontal) {
-				ctx.translate(cx, cy)
-				ctx.scale(-1, 1)
-				ctx.translate(-cx, -cy)
-				if (property.realType == 'Group') {
-					ctx.groupFlipX = -(ctx.groupFlipX || 1)
-				}
-			}
+		if (property.flipVertical) {
+		    ctx.translate(cx, cy)
+		    ctx.scale(1, -1)
+		    ctx.translate(-cx, -cy)
+		    if (property.realType == 'Group') {
+		        ctx.groupFlipY = -(ctx.groupFlipY || 1)
+		    }
+		}
+		if (property.flipHorizontal) {
+		    ctx.translate(cx, cy)
+		    ctx.scale(-1, 1)
+		    ctx.translate(-cx, -cy)
+		    if (property.realType == 'Group') {
+		        ctx.groupFlipX = -(ctx.groupFlipX || 1)
+		    }
 		}
 		// 嵌套容器 Group
 		let interior = property.interiorAnchor

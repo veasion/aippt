@@ -110,22 +110,6 @@ function D3Element(element) {
             return this
         }
     }
-    this.getFlipXy = function () {
-        let transform = element.getAttribute('transform')
-        let flipX = 1, flipY = 1
-        if (transform) {
-            let idx = -1
-            while ((idx = transform.indexOf('scale', idx + 1)) > -1) {
-                let arr = transform.substring(idx + 6, transform.indexOf(')', idx + 6)).replace('(', '').split(',')
-                let x = parseFloat(arr[0] || 0) < 0 ? -1 : 1
-                let y = (arr[1] == undefined ? x : parseFloat(arr[1])) < 0 ? -1 : 1
-                flipX *= x
-                flipX *= y
-                idx += 8
-            }
-        }
-        return { flipX, flipY }
-    }
     this.rotate = function (rotate, x, y, start) {
         let transform = element.getAttribute('transform')
         if (rotate == undefined) {
@@ -279,10 +263,12 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         return value ? value * zoom : value
     }
 
-    function shapeHandle(property, parent, isText) {
+    function shapeHandle(property, parent) {
         let g = parent.append('g')
         let anchor = scaleAnchor(property.anchor)
         if (!anchor) {
+            g.attr('groupFlipX', ctx.groupFlipX || 1)
+            g.attr('groupFlipY', ctx.groupFlipY || 1)
             return g
         }
         let transform = []
@@ -294,42 +280,20 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                 ctx.groupRotation = (ctx.groupRotation || 0) + property.rotation
             }
         }
-        if (isText) {
-            let x = ctx.groupFlipX || 1
-            let y = ctx.groupFlipY || 1
-            if (property.flipVertical) {
-                y *= -1
-                transform.push(`translate(${cx}, ${cy})`)
-                transform.push(`scale(1, -1)`)
-                transform.push(`translate(${-cx}, ${-cy})`)
+        if (property.flipVertical) {
+            transform.push(`translate(${cx}, ${cy})`)
+            transform.push(`scale(1, -1)`)
+            transform.push(`translate(${-cx}, ${-cy})`)
+            if (property.realType == 'Group') {
+                ctx.groupFlipY = -(ctx.groupFlipY || 1)
             }
-            if (y == -1) {
-                if (x == 1) {
-                    transform.push(`translate(${cx}, ${cy})`)
-                    transform.push(`scale(-1, 1)`)
-                    transform.push(`translate(${-cx}, ${-cy})`)
-                }
-            } else if (x == -1) {
-                transform.push(`translate(${cx}, ${cy})`)
-                transform.push(`scale(-1, 1)`)
-                transform.push(`translate(${-cx}, ${-cy})`)
-            }
-        } else {
-            if (property.flipVertical) {
-                transform.push(`translate(${cx}, ${cy})`)
-                transform.push(`scale(1, -1)`)
-                transform.push(`translate(${-cx}, ${-cy})`)
-                if (property.realType == 'Group') {
-                    ctx.groupFlipY = -(ctx.groupFlipY || 1)
-                }
-            }
-            if (property.flipHorizontal) {
-                transform.push(`translate(${cx}, ${cy})`)
-                transform.push(`scale(-1, 1)`)
-                transform.push(`translate(${-cx}, ${-cy})`)
-                if (property.realType == 'Group') {
-                    ctx.groupFlipX = -(ctx.groupFlipX || 1)
-                }
+        }
+        if (property.flipHorizontal) {
+            transform.push(`translate(${cx}, ${cy})`)
+            transform.push(`scale(-1, 1)`)
+            transform.push(`translate(${-cx}, ${-cy})`)
+            if (property.realType == 'Group') {
+                ctx.groupFlipX = -(ctx.groupFlipX || 1)
             }
         }
         // 嵌套容器 Group
@@ -351,6 +315,8 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         if (transform.length > 0) {
             g.attr('transform', transform.join(' '))
         }
+        g.attr('groupFlipX', ctx.groupFlipX || 1)
+        g.attr('groupFlipY', ctx.groupFlipY || 1)
         return g
     }
 
@@ -495,7 +461,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
     function drawText(obj, parent) {
         let property = obj.extInfo.property
         let geometryName = (property.geometry || {}).name || 'rect'
-        let g = shapeHandle(property, parent, true)
+        let g = shapeHandle(property, parent)
         g.attr('id', 'g-' + obj.id)
         addElementEvent(g, obj)
         if (geometryName == 'tableColumn') {
@@ -529,6 +495,31 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         textNode.style('user-select', 'none')
         if (isVertical) {
             textNode.style('writing-mode', 'vertical-rl')
+        }
+        let cx = anchor[0] + anchor[2] / 2
+        let cy = anchor[1] + anchor[3] / 2
+        let x = parseInt(g.attr('groupFlipX') || ctx.groupFlipX || 1)
+        let y = parseInt(g.attr('groupFlipY') || ctx.groupFlipX || 1)
+        let transform = []
+        if (property.flipHorizontal) {
+            x *= -1
+        }
+        if (property.flipVertical) {
+            y *= -1
+        }
+        if (y == -1) {
+            if (x == 1) {
+                transform.push(`translate(${cx}, ${cy})`)
+                transform.push(`scale(-1, 1)`)
+                transform.push(`translate(${-cx}, ${-cy})`)
+            }
+        } else if (x == -1) {
+            transform.push(`translate(${cx}, ${cy})`)
+            transform.push(`scale(-1, 1)`)
+            transform.push(`translate(${-cx}, ${-cy})`)
+        }
+        if (transform.length > 0) {
+            textNode.attr('transform', transform.join(' '))
         }
         let marginTop = property.strokeStyle ? scaleValue(property.strokeStyle.lineWidth || 1) : 0
         let maxFontSize = 0
@@ -1426,7 +1417,8 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         let x = e.clientX
         let y = e.clientY
         let g = d3.select(gNode)
-        let { flipX, flipY } = g.parent().getFlipXy()
+        let flipX = parseInt(g.attr('groupFlipX') || 1)
+        let flipY = parseInt(g.attr('groupFlipY') || 1)
         let lastTranslate = g.translate()
         let translateX = lastTranslate.x
         let translateY = lastTranslate.y
@@ -1518,7 +1510,8 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
             return
         }
         let g = d3.select(gNode)
-        let { flipX, flipY } = g.parent().getFlipXy()
+        let flipX = parseInt(g.attr('groupFlipX') || 1)
+        let flipY = parseInt(g.attr('groupFlipY') || 1)
         let rotate = g.rotate()
         if (!rotate.rotate && !rotate.x) {
             let anchor = scaleAnchor(obj.extInfo?.property?.anchor ? obj.extInfo.property.anchor : obj.point)
@@ -1612,7 +1605,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         console.log('obj', elementObj)
         let g = d3.select(gNode)
         currentSelect = elementObj
-        gNode.style.outline = '1px dashed #f35858'
+        // gNode.style.outline = '1px dashed #f35858'
         let isText = (elementObj.type == 'text' || elementObj.type == 'freeform') && elementObj.children && elementObj.children.length > 0
         if (isText) {
             let hasRs = false
@@ -1649,6 +1642,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         div.style.top = y + 'px'
         div.style.width = width + 'px'
         div.style.height = height + 'px'
+        div.style.outline = '1px dashed #f35858'
         let rotate = g.rotate().rotate
         if (rotate) {
             div.style.transform = `rotate(${rotate}deg)`
@@ -2060,20 +2054,13 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         textarea.style.overflow = 'hidden'
         textarea.style.outline = 'none'
         textarea.style.zIndex = 999
-        // textarea.style.outline = '1px dashed #f35858'
         let scrollY = window.scrollY || document.documentElement.scrollTop
         let scrollX = window.scrollX || document.documentElement.scrollLeft
         textarea.style.left = (rect.x + scrollX) + 'px'
         textarea.style.top = (rect.y + scrollY) + 'px'
-        let isMultiLine = rect.height >= fontSize * 2
         let textWordWrap = textObj.extInfo.property.textWordWrap ?? true
-        if (isMultiLine) {
-            textarea.style.width = rect.width + 'px'
-            textarea.style.height = (rect.height + fontSize * 2) + 'px'
-        } else {
-            textarea.style.width = (rect.width + fontSize * 2) + 'px'
-            textarea.style.height = rect.height + 'px'
-        }
+        textarea.style.width = (textObj.point[2] || rect.width) + 'px'
+        textarea.style.height = (textObj.point[3] || rect.height) + 'px'
         let rotation = (textObj.extInfo.property || {}).rotation
         if (rotation) {
             textarea.style.transformOrigin = 'center'
@@ -2084,6 +2071,11 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         }
         textarea.style.font = nodeStyle.font
         textarea.style.fontSize = fontSize + 'px'
+        let p_property = textObj.children[0]?.extInfo.property
+        // let lineSpacing = p_property.lineSpacing > 0 ? (p_property.lineSpacing / 100) : (1 + Math.abs(p_property.lineSpacing || 0) / 100)
+        // if (lineSpacing && lineSpacing != 1) {
+        //     textarea.style.lineHeight = lineSpacing
+        // }
         textarea.value = obj.text
         nodes.forEach(s => s.style.visibility = 'hidden')
         document.body.appendChild(textarea)
@@ -2107,12 +2099,46 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
                 $this.onchange(textObj)
             }
         })
+        textarea.addEventListener('focus', function () {
+            if (textarea.scrollHeight > textarea.clientHeight) {
+                if (textWordWrap) {
+                    textarea.style.height = textarea.scrollHeight + 'px'
+                } else {
+                    textarea.style.width = textarea.clientWidth + fontSize + 'px'
+                }
+            } else if (textarea.scrollWidth > textarea.clientWidth) {
+                if (textWordWrap) {
+                    textarea.style.height = textarea.clientWidth + fontSize + 'px'
+                } else {
+                    textarea.style.width = textarea.scrollWidth + 'px'
+                }
+            }
+        })
         textarea.addEventListener('input', function () {
             if (textarea.scrollHeight > textarea.clientHeight) {
-                if (isMultiLine || textWordWrap) {
-                    textarea.style.height = (textarea.scrollHeight + fontSize * 2) + 'px'
+                if (textWordWrap) {
+                    textarea.style.height = textarea.scrollHeight + 'px'
+                    if (textObj.extInfo.property.textVerticalAlignment == 'BOTTOM') {
+                        textarea.style.top = +textarea.style.top.replace('px', '') - fontSize + 'px'
+                    } else if (textObj.extInfo.property.textVerticalAlignment == 'MIDDLE') {
+                        textarea.style.top = +textarea.style.top.replace('px', '') - fontSize / 2 + 'px'
+                    }
                 } else {
-                    textarea.style.width = (textarea.clientWidth + fontSize * 2) + 'px'
+                    textarea.style.width = textarea.clientWidth + fontSize + 'px'
+                    if (p_property.textAlign == 'RIGHT') {
+                        textarea.style.left = +textarea.style.left.replace('px', '') - fontSize + 'px'
+                    } else if (p_property.textAlign == 'CENTER') {
+                        textarea.style.left = +textarea.style.left.replace('px', '') - fontSize / 2 + 'px'
+                    }
+                }
+            } else if (textarea.scrollWidth > textarea.clientWidth) {
+                if (!textWordWrap) {
+                    textarea.style.width = textarea.scrollWidth + 'px'
+                    if (p_property.textAlign == 'RIGHT') {
+                        textarea.style.left = +textarea.style.left.replace('px', '') - fontSize + 'px'
+                    } else if (p_property.textAlign == 'CENTER') {
+                        textarea.style.left = +textarea.style.left.replace('px', '') - fontSize / 2 + 'px'
+                    }
                 }
             }
         })
