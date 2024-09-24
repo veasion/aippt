@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 // import { geometryPaths } from './geometry.js'
 // import { drawChart } from './chart.js'
 
