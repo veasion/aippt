@@ -539,6 +539,10 @@
                 let a = document.createElement('a')
                 a.href = window.URL.createObjectURL(blob)
                 let name = 'download'
+                let subject = document.getElementById('subject')
+                if (subject && subject.value) {
+                    name = subject.value
+                }
                 a.download = name + '.pptx'
                 a.click()
             }
