@@ -9,7 +9,7 @@
             height: 5px;
             background-color: #fff;
         }
-		::-webkit-scrollbar-thumb {
+        ::-webkit-scrollbar-thumb {
             background-color: #c1c1c1;
         }
         .docmee {
@@ -31,7 +31,7 @@
             text-align: center;
             margin-top: 60px;
         }
-        #div1, #div2, #div3, #nextTo2, #nextTo3, #desc, #right_canvas, #pptDownload {
+        #div1, #div2, #div3, #nextTo2, #nextTo3, #desc, #right_canvas {
             display: none;
         }
         #outline {
@@ -92,6 +92,7 @@
             list-style: none;
         }
         #pptDownload {
+            display: none;
             float: right;
         }
         .left_div {
@@ -213,7 +214,14 @@
             <option value="chart,doughnut">插入环形图</option>
             <option value="chart,line">插入折线图</option>
         </select>
-        <a id="pptDownload" href="javascript:downloadPptx()">渲染pptx并下载</a>
+        <div id="pptDownload">
+            <select id="download_select" style="margin-right: 5px">
+                <option value="">-- 下载选项 --</option>
+                <option value="0">不添加动画</option>
+                <option value="1">智能添加动画</option>
+            </select>
+            <a id="downloadPptx" href="javascript:downloadPptx()">渲染pptx并下载</a>
+        </div>
         <div id="right_container" style="padding-top: 8px;">
             <!--<canvas id="right_canvas" width="1920" height="1080" style="width: 960px;height: 540px;"></canvas>-->
             <svg id="right_canvas"></svg>
@@ -235,7 +243,7 @@
     // 文多多AiPPT
     // 官网 https://docmee.cn
     // 开放平台 https://docmee.cn/open-platform
-	
+    
     const apiKey = '5hy7sdN5ops9n62zx'
     var pptxId = null
     var outline = ''
@@ -256,15 +264,15 @@
         silent: true // 错误时不抛异常
     })
 
-	// canvas
-	// var painter = new Ppt2Canvas('right_canvas')
-	// var canvas = painter.getCanvas()
+    // canvas
+    // var painter = new Ppt2Canvas('right_canvas')
+    // var canvas = painter.getCanvas()
 
-	// svg
-	var painter = new Ppt2Svg('right_canvas')
-	var canvas = painter.svgNode()
-	painter.setMode('edit')
-	
+    // svg
+    var painter = new Ppt2Svg('right_canvas')
+    var canvas = painter.svgNode()
+    painter.setMode('edit')
+    
     function generateOutline() {
         let subject = document.getElementById('subject').value
         if (!subject) {
@@ -513,15 +521,19 @@
         painter.drawPptx(pptxObj, idx)
     }
     function downloadPptx() {
-        let download = document.getElementById('pptDownload')
+        let download = document.getElementById('downloadPptx')
         // 渲染pptx并下载
         if (download.innerText.indexOf('下载') == -1) {
             return
         }
         download.innerText = '正在渲染中...'
+        let animationType = document.getElementById('download_select').value
+        if (animationType != '1' && animationType != '2') {
+            animationType = null
+        }
         let xhr = new XMLHttpRequest()
         xhr.responseType = 'blob'
-        xhr.open('POST', 'https://docmee.cn/api/public/ppt/json2ppt?animationType=1&apiKey=' + apiKey)
+        xhr.open('POST', 'https://docmee.cn/api/public/ppt/json2ppt?animationType=' + animationType + '&apiKey=' + apiKey)
         xhr.setRequestHeader('Content-Type', 'application/json')
         xhr.onload = function() {
             if (this.status == 200) {
@@ -675,15 +687,15 @@
         document.getElementById('insert_element').value = ''
     }
     function resetSize() {
-	    let width = Math.max(Math.min(document.body.clientWidth - 400, 1600), 480)
-	    painter.resetSize(width, width * 0.5625)
-	}
+        let width = Math.max(Math.min(document.body.clientWidth - 400, 1600), 480)
+        painter.resetSize(width, width * 0.5625)
+    }
 
     window.addEventListener('resize', function() {
         mTimer && clearTimeout(mTimer)
-	    mTimer = setTimeout(() => {
+        mTimer = setTimeout(() => {
             resetSize()
-	    }, 50)
+        }, 50)
     })
 
     document.getElementById('div1').style.display = 'block'
