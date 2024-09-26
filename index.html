@@ -533,7 +533,7 @@
         }
         let xhr = new XMLHttpRequest()
         xhr.responseType = 'blob'
-        xhr.open('POST', 'https://docmee.cn/api/public/ppt/json2ppt?animationType=' + animationType + '&apiKey=' + apiKey)
+        xhr.open('POST', 'https://docmee.cn/api/public/ppt/json2ppt?animationType=' + (animationType || '') + '&apiKey=' + apiKey)
         xhr.setRequestHeader('Content-Type', 'application/json')
         xhr.onload = function() {
             if (this.status == 200) {
