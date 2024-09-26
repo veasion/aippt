@@ -1635,6 +1635,7 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         ]
         let div = document.createElement('div')
         div.id = 'move_element_operate'
+        div.style.zIndex = 9999
         div.style.position = 'fixed'
         div.style.userSelect = 'none'
         div.style.pointerEvents = 'none'
@@ -2059,8 +2060,8 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
         textarea.style.left = (rect.x + scrollX) + 'px'
         textarea.style.top = (rect.y + scrollY) + 'px'
         let textWordWrap = textObj.extInfo.property.textWordWrap ?? true
-        textarea.style.width = (textObj.point[2] || rect.width) + 'px'
-        textarea.style.height = (textObj.point[3] || rect.height) + 'px'
+        textarea.style.width = Math.max(scaleValue(textObj.point[2]) || rect.width, fontSize) + 'px'
+        textarea.style.height = Math.max(scaleValue(textObj.point[3]) || rect.height, fontSize) + 'px'
         let rotation = (textObj.extInfo.property || {}).rotation
         if (rotation) {
             textarea.style.transformOrigin = 'center'
@@ -2154,6 +2155,11 @@ function Ppt2Svg(_svg, svgWidth, svgHeight) {
     this.toColorValue = toColorValue
     this.loadImage = loadImage
     this.text = text
+    this.scaleValue = scaleValue
+    this.showPoint = showPoint
+    this.removePoint = removePoint
+    this.addElementMoveScale = addElementMoveScale
+    this.removeElementMoveScale = removeElementMoveScale
 
     d3.addEventListener('document', 'mousemove', function(event) {
         if (!pptx) {
