@@ -63,9 +63,6 @@ https://docmee.cn
 开放平台（API/UI 接入）：
 https://docmee.cn/open-platform
 
-客户案例（PPT课件+数字人）：
-https://github.com/taoofagi/easegen-front
-
 商业合作 & 进群交流：
 
 ![qrcode](https://metasign-public.oss-cn-shanghai.aliyuncs.com/github/contact_me_qr.png)
